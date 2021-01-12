@@ -1,0 +1,28 @@
+extends layout
+block content
+  +banner('Tabs Sandbox')
+  
+  +tab-tabs([
+      {text:'Server',href:'#tab_1',class:'active'},
+      {text:'Users',href:'#tab_2'},
+      {text:'Tab 3',href:'#tab_3'}
+    ],{})
+  
+  +tab-panels()
+    +tab-panel({id:'tab_1',class:'show active'})
+      H5 First Tab Panel
+      p Consequat occaecat ullamco amet non eiusmod nostrud dolore irure incididunt est duis anim sunt officia.      
+    
+    +tab-panel({id:'tab_2'})
+      H5 Second Tab Panel
+      p Fugiat velit proident aliquip nisi incididunt nostrud exercitation proident est nisi. Irure magna elit commodo anim ex veniam culpa eiusmod id nostrud sit cupidatat in veniam ad.
+      
+    +tab-panel({id:'tab_3'})
+      H5 Third Tab Panel
+      p Eiusmod consequat eu adipisicing minim anim aliquip cupidatat culpa excepteur quis. Occaecat sit eu exercitation irure Lorem incididunt nostrud.
+      
+  
+  script.
+    // $('a[href="#tab_1"]').click();
+      
+         

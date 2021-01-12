@@ -1,0 +1,73 @@
+{
+  "APP": {
+    "license": "",
+    "port": 8880,
+    "timer_mins": 15,
+    "title": "VPAS"
+  },
+  
+  "MENUS": {
+    "users":{"text":"Users","id":"users","icon":"user"}
+  },
+
+  "USERS": {
+    "SYSADM":{
+      "passwd": "kampong",
+      "role": "admin"
+    },
+
+    "SUPER":{
+      "passwd": "kampong",
+      "role": "super"
+    },
+
+    "CLSWLH":{
+      "passwd": "kampong",
+      "role": "user"
+    }
+
+  },
+
+  "ROLES": {
+    "super": ["em","cc","ooo","po"],
+    "user": ["po"],
+    "admin": ["db","em","users","cc","ooo","po"]
+  },
+
+  "SQLITE": {
+    "UI": {
+      "database"    : "/usr/share/dev/nodejs/src/pure3/data/dwap.db",
+      "_database"   : "data/ui.db",
+      "timeout_ms"  : 2000
+    }
+  },
+
+  "MSSQL": {
+    "VMFG": {
+      "server": "localhost",
+      "database": "SQLD908",
+      "userName": "SYSADM",
+      "password": "SYSADM"
+    }
+  },
+  
+  "MYSQL": {
+    "MYDEV": {
+      "server": "puredb",
+      "database": "MYDEV",
+      "userName": "root",
+      "password": "bukit8002"
+    }
+  },
+  
+  "MAIL": {
+    "IMAP_SVR": "smtp-mail.outlook.com",
+    "IMAP_PORT": "993",
+    "SMTP_SVR": "smtp-mail.outlook.com",
+    "SMTP_PORT": "587",
+    "UID": "dis.pm@outlook.sg",
+    "PWD": "6nAK3BR26H5uTky",
+    "SMTP_AUTH": 1,
+    "DELAY_MS": 100
+  }
+}

@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  +banner('Users')
+  +form({'data-options':"type:'multi',sqlid:'user',fkey:'USER_ID',buttons:['save','cancel']"})
+    +fitem({text:'User ID'},{type:'combo',sqlid:'users_combo',name:'USER_ID'})
+    +fitem({text:'User Name'},{name:'USER_NAME',type:'text'})
+    +fitem({text:'Email Address'},{name:'EMAIL',type:'email'})
+

@@ -1,0 +1,53 @@
+-
+  session = session || {}
+  
+mixin nav(brand)
+  nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
+    a.navbar-brand(href='#')=`${brand} [${session.user || ''}]`
+    button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    #navbarNav.collapse.navbar-collapse
+      ul.navbar-nav
+        block
+
+mixin nav-item(text,href,icon)
+  li.nav-item
+    a.nav-link(href=href)
+      if icon
+        i.fa(class=`fa-${icon}`)
+      span=text
+
+mixin nav-drop(text)
+  li.nav-item.dropdown
+    a#navbarDropdown.nav-link.dropdown-toggle(href='#' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')=text
+    .dropdown-menu(aria-labelledby='navbarDropdown')
+      block
+
+mixin nav-drop-item(text,href)
+  a.dropdown-item(href=href)=text
+
+if session && session.menus
+  +nav($.config.APP.title || 'Visual PAS')
+    +nav-item('Home','/','home')
+    each path in session.menus
+      - var item = $.config.MENUS[path];
+      if item  
+        +nav-item(item.text,path,item.icon)
+    +nav-item('Logout','/logout','sign-out-alt')
+      
+//-
+  +nav-item('home','Home','/','home')
+  +nav-item('db','Database','/db','database')
+  +nav-item('email','Email','/em','at')
+  +nav-item('users','Users','/users','user')
+  +nav-item('costs','Cost Centres','/cc','dollar-sign')
+  +nav-item('ooo','Out Of Office','/apprv_bkp','save')
+  +nav-item('logs','PO Logs','/po','clipboard-list')
+  +nav-item('quit','Logout','/logout','sign-out-alt')  
+//-
+  +nav-drop('Development')
+    +nav-drop-item('Form Single','/form-s')
+    +nav-drop-item('Form Multi','/form-m')
+    +nav-drop-item('Datagrid','/grid')
+    +nav-drop-item('Tabs','/tabs')
+    +nav-drop-item('WLH Test','/wlh')

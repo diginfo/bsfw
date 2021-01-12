@@ -1,0 +1,86 @@
+extends layout
+
+block style
+  style.
+    p.logo {
+      font-size: 2.5rem;
+      color: #777777;
+      position: relative;
+      top: -0.5em;
+    }
+    
+    .card-panel {
+      box-shadow: rgba(0, 0, 0, 0.1) 0 5px 40px, rgba(0, 0, 0, 0.1) 0 5px 10px;
+      border-bottom: 10px solid transparent;
+      transition: box-shadow 0.25s;
+      padding: 20px;
+      margin: 0.5rem 0 1rem;
+      border-radius: 2px;
+      background-color: #fff;
+    }
+    
+    /* Font Awesome Icons */
+    .form-group a i {
+      font-family: FontAwesome;
+      margin: 0 auto;
+      font-size: 5rem;
+      font-style: normal;
+    }
+    
+    .min-container .card-panel form .fa {
+      top: 13px;
+      right: 1rem;
+    }
+    
+    /* Media Queries */
+    @media (min-width: 768px) {
+      .min-container {
+        max-width: 650px;
+      }
+    }
+    
+    .min-container {
+      margin: 0 auto;
+    }
+      
+                     
+block content
+  if !userauth
+    .min-container.py-md-2
+      .card-panel.p-sm-5.position-relative
+        .text-center
+          img.img-fluid.w-50(src='img/dis.cologo.png' alt='Logo')
+          h1.h2.mt-5 PAS Admin Login
+        form#loginForm.mt-5(autocomplete='on')
+          p.small.mb-2.text-scarlet
+          .form-group.position-relative
+            label.sr-only(for='email') Email
+            input.form-control.input-lg.rounded-0.upper(autocomplete='username' autofocus name='username' type='text' placeholder='Username' required)
+            i.fa.fa-user.fa-lg.position-absolute
+          label.pull-left.sr-only(for='password') Password
+          .position-relative
+            input#password.form-control.input-lg.rounded-0(autocomplete='password' name='password' type='password' placeholder='Password' required)
+            i.fa.fa-lock.fa-lg.position-absolute
+          .text-center.my-4
+            input.btn.btn-primary.text-white.btn-lg.text-uppercase(type='submit' value='Login')
+  else
+    .d-flex.justify-content-md-center.align-items-center.vh-100
+      div.text-center
+        img.img-fluid.w-100(src='img/dis.cologo.png' alt='Logo')
+        p.font-weight-light.logo VISUAL PAS
+
+block script
+  script.
+    $('#loginForm').on('submit',function(e){
+      e.preventDefault();
+      const data = {};
+      $(this).serializeArray().map(function(item){
+        data[item.name] = item.value || '';  
+      })
+      bs.ajaxGet('/login',data,function(res){
+        var lp = getCookie('lastPage');
+        if(res=='success' && lp) location.href = lp;  
+      }) 
+    })
+        
+        

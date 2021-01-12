@@ -1,0 +1,48 @@
+{
+  "name": "visual-pas",
+  "version": "0.0.1",
+  "description": "Visual PAS",
+  "keywords": [],
+  "author": "DiS",
+  "license": "Unlicense",
+  
+  "dependencies": {
+    "async": "*",
+    "body-parser": "*",
+    "express": "*",
+    "express-session": "*",
+    "isomorphic-git": "^1.8.0",
+    "mysql": "*",
+    "nodemailer": "*",
+    "pug": "*",
+    "sqlite3": "^5.0.0",
+    "tedious": "*"
+  },
+  
+  "scripts": {
+    "test": "echo 'start-test'",
+    "pretest": "echo 'pre-test'",
+    "posttest": "echo 'post-test'",
+    "sm": "node /usr/share/dev/nodejs/src/visual/pas/v2/lib/sm",
+    "rm": "node /usr/share/dev/nodejs/src/visual/pas/v2/lib/rm"
+  },
+  
+  "main": "index.js",
+  "bin": "index.js",
+  
+  "pkg": {
+    "scripts": [
+      "lib/**/*.js"
+    ],
+    "assets": [
+      "public/**/*",
+      "sql/**/*"
+    ]
+  },
+  
+  "_repository": {
+    "type": "git",
+    "url": "git@github.com:diginfo/visual-pas.git",
+    "private": true
+  }
+}

@@ -1,0 +1,43 @@
+extends layout
+block content
+  +banner('Data Grid')
+  #grid(data-options="sqlid:'grid'")
+
+block script  
+  script.
+    
+    $('#grid').dgrid({
+      
+      height  : '150px',
+      key     : 'row',
+      sqlid   : 'grid',
+      striped : true,
+      
+      columns : [
+        {field:'row',title:'#',editor:'text'},
+        {field:'first',title:'First',editor:'text'},
+        {field:'last',title:'Last',editor:'text'},
+        {field:'handle',title:'Handle',editor:'text'},
+      ],
+      
+      _data: {
+        rows : [
+          {row:1,first:'Mark',last:'Otto',handle:'@mdo'},
+          {row:2,first:'Jacob',last:'Thornton',handle:'@fat'},
+          {row:3,first:'Larry',last:'Bird',handle:'@twitter'},
+          
+        ]
+      } 
+    });
+    
+    setTimeout(function(){
+      //$('#table').dgrid('selectRow',0);
+      //cl($('#table').dgrid('getSelected'));
+      //$('#table').dgrid('editRow',0);
+      //$('#table').dgrid('reload'); 
+    
+    },1000)
+  
+  
+        
+        

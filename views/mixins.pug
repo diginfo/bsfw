@@ -1,0 +1,116 @@
+-
+  const colmap = {
+    'green'   : 'success', 
+    'red'     : 'danger',
+    'blue'    : 'primary',
+    'grey'    : 'secondary',
+    'yellow'  : 'warning',
+    'cyan'    : 'alert',
+    'white'   : 'light',
+    'black'   : 'dark', 
+  }
+
+mixin fieldset(text)
+  -text=text || '';
+  fieldset&attributes(fset)
+    legend=text
+    block
+
+mixin tab-tabs(items,arg)
+  nav
+    .nav.nav-tabs(role="tablist")&attributes(arg)
+      each item in items
+        -var text = item.text; delete item.text;
+        a.nav-link(data-toggle="tab" href=item.href||'#' role="tab")&attributes(item)=text
+
+mixin tab-panels(arg)
+  .tab-content&attributes(arg)
+    block
+
+mixin tab-panel(arg)
+  .tab-pane.fade(role="tabpanel")&attributes(arg)
+    block
+
+mixin table(arg)  
+  -arg = arg || {columns:[],data:[]}
+  table.table.table-striped_.table-hover
+    thead.thead-dark
+      tr
+        each item in arg.columns
+          th(scope='col' field=item.field)=item.title
+    tbody
+      each row in arg.data
+        tr
+          each col in arg.columns
+            td=row[col.field]
+            
+mixin navbar()
+  include navbar.pug
+  
+mixin form(arg)
+  //-todo: this should be in the widget.
+  form.bs-form()&attributes(arg)
+    block
+    
+mixin banner(text,color)
+  -color=color||'blue';
+  .alert(class=`alert-${colmap[color]}` role="alert")
+    =text
+
+mixin alert(text,color)
+  banner(text,color)
+
+mixin button(text,arg)
+  -
+    arg=arg||{};
+    var color=arg.color||'primary'; delete arg.color;
+  button(type="button" class=`btn btn-${color}`)&attributes(arg)
+    =text
+
+mixin label(arg)
+  -
+    arg = arg || {};
+    arg.text=arg.text||'';
+  label.form-control-label()&attributes(arg)
+    =arg.text
+
+mixin combo(arg)
+  -
+    var data = arg.data; delete arg.data;
+  select.form-control.form-control-sm.bs-combo()&attributes(arg)
+    option(disabled selected) Select
+    if data
+      each item in data
+        option(value=item.value)=item.text
+
+mixin input(arg)
+  -
+    arg=arg || {};
+    arg.required = arg.required || true;
+    if(arg.id && arg.name=='~') arg.name = arg.id;
+    else if(arg.name && arg.id=='~') arg.id = arg.name; 
+    arg.type = arg.type || 'text';
+    arg['aria-describedby'] = arg['aria-describedby'] || '';
+    if(arg.type=='hostname' || arg.type=='host'){
+      arg.type = 'text';
+      arg.pattern = '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$';
+    }
+  
+  if arg.type == 'combo'
+    +combo(arg)
+  else
+    if arg.type == 'hidden'
+      input&attributes(arg)
+    else
+      input.form-control.form-control-sm.bs-input(data-error="Value is invalid.")&attributes(arg)
+
+mixin fitem(label,input,fitem)
+  -
+    fitem=fitem||{};
+    label.for=input.id || input.name || null;
+  .form-group&attributes(fitem)
+    +label(label)
+    +input(input) 
+    if block
+      block
+    //-.valid-feedback Looks Good

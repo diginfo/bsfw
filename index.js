@@ -206,6 +206,11 @@ $.app.get('/*', (req, res) => {
   });
 });
 
+
+module.exports.timed = function(fnid){
+  if($.timed.indexOf(fnid) < 0) $.timed.push(fnid);
+}
+
 module.exports.sqlid = function(lib){
   $.lib.sqlid = Object.assign($.lib.sqlid,lib)
 }
@@ -226,7 +231,7 @@ module.exports.start = function(){
     if($.config.APP.timer_mins > 0) timer(function(day,hms){
       // user.sesscln();
       $.timed.map(function(item){
-        item();  
+        $.timed[item]();  
       })
     })
   

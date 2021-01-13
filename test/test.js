@@ -71,5 +71,13 @@ var test = {
 //test.lib();
 //test.api();
 //test.start();
-test.timed();
+//test.timed();
+
+
+$.lib.fn.jsonPut($.path.join(__dirname,'config.json'),{
+  APP:{
+    XX:123
+  }
+},cl)
+$.lib.fn.jsonGet($.path.join(__dirname,'config.json'),cl)
 

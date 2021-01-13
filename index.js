@@ -230,10 +230,12 @@ module.exports.start = function(){
     // call 5 minute timer
     if($.config.APP.timer_mins > 0) timer(function(day,hms){
       // user.sesscln();
-      $.timed.map(function(item){
-        $.timed[item]();  
+      $.timed = [...new Set($.timed)];
+      for(var idx in $.timed){
+        try{$.timed[idx]()}
+        catch(err){ce(`${$.timed[idx]}:${err}`)}
+      }
       })
-    })
   
   	cl(`Server started at port ${$.config.APP.port} with timer ${$.config.APP.timer_mins} mins.`);
   });

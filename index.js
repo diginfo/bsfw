@@ -266,12 +266,7 @@ module.exports.config = {
     //delete require.cache[require.resolve($.paths.config)];
     if(path) $.paths.config = path;
     var config = require($.paths.config);
-    for(var key in config){
-      if(typeof config[key]=='object'){
-        $.config[key] = Object.assign($.config[key],config[key]);    
-      }
-      else $.config.key = config[key]; 
-    }
+    $.config = $.lib.fn.merge($.config,config);
     
     // reload database defs
     $.lib.db.load();

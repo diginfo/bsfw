@@ -878,11 +878,15 @@ $.widget("bs.dgrid",{
 
   updateRow: function(idx,row){
     this.options.data.rows[idx] = Object.assign(this.options.data.rows[idx],row);
-    this.reload(); 
+    this.reload({
+      rows:this.options.data.rows,
+      total: this.options.data.rows.length 
+    }); 
   },
 
-  reload: function(){
-    this.load();  
+  reload: function(data){
+    if(data) this.load(data);
+    else this.load();  
   },
 
   editRow: function(idx,row){

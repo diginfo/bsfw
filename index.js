@@ -16,17 +16,23 @@ if (__abs.match(/snapshot/)) {
 
 global.$ = {
   isbin       : isbin,
+  
   async       : require('async'),
   path        : path,
   fs          : require('fs'),
   crypto      : require('crypto'),
   util        : require('util'),
   pug         : require('pug'),
-
+  
+  timed       : [],
+  
+  lib         : {},
+  
   paths: {
     abs     : __abs,
     config  : path.join(__dirname,'config.json'),
     views   : path.join(__dirname,'views'),
+    lib     : path.join(__dirname,'lib'),
   },
   
   views     : [path.join(__dirname,'views')],
@@ -41,7 +47,13 @@ const session = require('express-session');
 $.app = express(); 
 $.sstore = new session.MemoryStore()
 
-$.lib = require('./lib');
+// Libs
+$.lib.fn     = require(path.join($.paths.lib,'fn.js'));
+$.lib.db     = require(path.join($.paths.lib,'db'));
+$.lib.mailer = require(path.join($.paths.lib,'mailer'));
+$.lib.sqlid  = require(path.join($.paths.lib,'sqlid'));
+
+$.lib.user   = require(path.join($.paths.lib,'user'));
 
 // Views
 $.app.set('views',$.views);
@@ -194,11 +206,14 @@ $.app.get('/*', (req, res) => {
   });
 });
 
+module.exports.sqlid = function(lib){
+  $.lib.sqlid = Object.assign($.lib.sqlid,lib)
+}
 
 module.exports.config = function(path){
-  delete require.cache[require.resolve($.paths.config)];
+  //delete require.cache[require.resolve($.paths.config)];
   if(path) $.paths.config = path;
-  $.config = require($.paths.config);
+  $.config = Object.assign($.config,require($.paths.config));
 
   // reload database defs
   $.lib.db.load();  
@@ -210,9 +225,9 @@ module.exports.start = function(){
     // call 5 minute timer
     if($.config.APP.timer_mins > 0) timer(function(day,hms){
       // user.sesscln();
-      send.go(function(ok){
-        read.go(cl);  
-      });
+      $.timed.map(function(item){
+        item();  
+      })
     })
   
   	cl(`Server started at port ${$.config.APP.port} with timer ${$.config.APP.timer_mins} mins.`);

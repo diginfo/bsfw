@@ -1,7 +1,7 @@
 {
-  "name": "visual-pas",
+  "name": "bsfw",
   "version": "0.0.1",
-  "description": "Visual PAS",
+  "description": "Bootstrap Framework",
   "keywords": [],
   "author": "DiS",
   "license": "Unlicense",
@@ -20,29 +20,14 @@
   },
   
   "scripts": {
-    "test": "echo 'start-test'",
-    "pretest": "echo 'pre-test'",
-    "posttest": "echo 'post-test'",
-    "sm": "node /usr/share/dev/nodejs/src/visual/pas/v2/lib/sm",
-    "rm": "node /usr/share/dev/nodejs/src/visual/pas/v2/lib/rm"
   },
   
   "main": "index.js",
   "bin": "index.js",
-  
-  "pkg": {
-    "scripts": [
-      "lib/**/*.js"
-    ],
-    "assets": [
-      "public/**/*",
-      "sql/**/*"
-    ]
-  },
-  
-  "_repository": {
+    
+  "repository": {
     "type": "git",
-    "url": "git@github.com:diginfo/visual-pas.git",
+    "url": "git@github.com:diginfo/bsfw.git",
     "private": true
   }
 }

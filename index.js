@@ -206,6 +206,9 @@ $.app.get('/*', (req, res) => {
   });
 });
 
+module.exports.views = function(view){
+  if($.views.indexOf(view) < 0) $.views.push(view);  
+}
 
 module.exports.timed = function(fnid){
   if($.timed.indexOf(fnid) < 0) $.timed.push(fnid);

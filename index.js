@@ -30,13 +30,13 @@ global.$ = {
   
   paths: {
     abs     : __abs,
-    config  : path.join(__dirname,'config.json'),
-    views   : path.join(__dirname,'views'),
-    lib     : path.join(__dirname,'lib'),
+    config  : path.join(__dirname,'./config.json'),
+    views   : path.join(__dirname,'./views'),
+    lib     : path.join(__dirname,'./lib'),
   },
   
-  views     : [path.join(__dirname,'views')],
-  public    : path.join(__dirname,'public'),
+  views     : [path.join(__dirname,'./views')],
+  public    : path.join(__dirname,'./public'),
   
 };
 
@@ -48,12 +48,12 @@ $.app = express();
 $.sstore = new session.MemoryStore()
 
 // Libs
-$.lib.fn     = require(path.join($.paths.lib,'fn.js'));
-$.lib.db     = require(path.join($.paths.lib,'db'));
-$.lib.mailer = require(path.join($.paths.lib,'mailer'));
-$.lib.sqlid  = require(path.join($.paths.lib,'sqlid'));
+$.lib.fn     = require(path.join($.paths.lib,'./fn.js'));
+$.lib.db     = require(path.join($.paths.lib,'./db'));
+$.lib.mailer = require(path.join($.paths.lib,'./mailer'));
+$.lib.sqlid  = require(path.join($.paths.lib,'./sqlid'));
 
-$.lib.user   = require(path.join($.paths.lib,'user'));
+$.lib.user   = require(path.join($.paths.lib,'./user'));
 
 // Views
 $.app.set('views',$.views);

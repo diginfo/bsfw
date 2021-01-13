@@ -78,7 +78,7 @@ $.app.use(session({
 }));
 
 // disable caching
-function nocache(){
+module.exports.nocache = function(){
   $.app.disable('view cache');
   $.app.set('cache', false);
   $.app.set('etag', false);
@@ -100,14 +100,23 @@ process.on('uncaughtException', function (err) {
   ce('CRASH - END\r\n\r\n');
 });
 
+module.exports.api = function(arg,cb){
+	arg = arg || {sqlid:null,func:null};
+  try {
+    var sqlid = arg.sqlid; delete(arg.sqlid);
+    var func = arg.func; delete(arg.func);
+    cb($.lib.sqlid[sqlid][func](arg,cb));
+  } catch(e){
+    return cb({error:true,msg:e.message})  
+  } 
+}
+
 function api(req,res,next){
 	cl('api:',req.path,req.query);
 	//cl(sstore.sessions)
 	//const id = path.basename(req.path);
 	const [_,__,func,id] = req.path.split('/');
-	if(!(id in $.lib.sqlid) || !(func in $.lib.sqlid[id]) ) return res.send({error:true,msg:`Invalid Endpoint <${id}>`})
 	
-  // object
   return $.lib.sqlid[id][func](req.query,function(data){
     res.json(data);	
 	});
@@ -128,10 +137,6 @@ function timer(cb,delay){
     }
   },1000);
 }
-
-// disable caching for deleopment
-nocache();
-
 
 // first middlewars.
 $.app.use(function(req,res,next){
@@ -174,8 +179,10 @@ $.app.get('*',function (req, res, next) {
 
 // Logout endpoint
 $.app.get('/logout', function (req, res) {
-  req.session.destroy();
-  res.render("index");
+  module.exports.render('index',req,function(html){
+    req.session.destroy();
+    res.send(html);
+  });
 });
 
 // api data request
@@ -184,63 +191,140 @@ $.app.post('/api/*/*',api);
 
 // page request
 $.app.get('/*', (req, res) => {
-  // cl(req.path)
-	//if(req.path=='/favicon.ico') return res.end();
 	var view = path.basename(req.path);
 	if(!view || view=='/') view = 'index';
-	// cl(req.session.menus,view);
-	// || !req.session.menus[view]
-
-	res.render(view,{
-  	query     : req.query,
-  	userauth  : req.session.user,
-  	session   : req.session,
-  	config    : $.config
-  },function(err,html){
-    //if(err) res.redirect('/');
-    if(err) {
-      res.end();
-      cl(err);
-    }
-    else res.send(html);  
+  return module.exports.render(view,req,function(html){
+    res.send(html);  
   });
 });
 
-module.exports.views = function(view){
-  if($.views.indexOf(view) < 0) $.views.push(view);  
+module.exports.render = function(view,arg,cb){
+  arg.session = arg.session || {user:null};
+  arg.query = arg.query || {};
+
+  var ppath;
+  for(var i in $.views.reverse()){
+    ppath = $.path.join($.views[i],view);
+    if(!(/\.pug$/).test(ppath)) ppath += '.pug';
+    if($.fs.existsSync(ppath)) {
+      $.pug.renderFile(ppath,{
+          basedir   : $.views[0],
+        	query     : arg.query,
+        	userauth  : arg.session.user,
+        	session   : arg.session,
+        	config    : $.config
+      },function(err,html){
+        if(err) return cb({error:true,msg:err.message})
+        else cb(html);  
+      });       
+      break;
+    }
+  }
 }
 
-module.exports.timed = function(fnid){
-  if($.timed.indexOf(fnid) < 0) $.timed.push(fnid);
+
+module.exports.lib = {
+  define: function(name,path){
+    delete require.cache[require.resolve(path)];
+    $.lib[name] = require(path);
+  }    
 }
 
-module.exports.sqlid = function(lib){
-  $.lib.sqlid = Object.assign($.lib.sqlid,lib)
+module.exports.view = {
+  define: function(view){
+    if($.views.indexOf(view) < 0) $.views.push(view);
+  }  
 }
 
-module.exports.config = function(path){
-  //delete require.cache[require.resolve($.paths.config)];
-  if(path) $.paths.config = path;
-  $.config = Object.assign($.config,require($.paths.config));
+module.exports.timed = {
+  define: function(fnid){
+    if($.timed.indexOf(fnid) < 0) $.timed.push(fnid);
+  }
+}
 
-  // reload database defs
-  $.lib.db.load();  
+module.exports.sqlid = {
+  
+  define: function(lib){
+    $.lib.sqlid = Object.assign($.lib.sqlid,lib)
+  },
+  
+  get: function(id,qry,cb){
+    $.lib.sqlid[id].get(qry,cb);  
+  },
+
+  put: function(id,qry,cb){
+    $.lib.sqlid[id].put(qry,cb);  
+  },
+
+  del: function(id,qry,cb){
+    $.lib.sqlid[id].del(qry,cb);  
+  },  
+}
+
+module.exports.config = {
+  define: function(path){
+    //delete require.cache[require.resolve($.paths.config)];
+    if(path) $.paths.config = path;
+    var config = require($.paths.config);
+    for(var key in config){
+      if(typeof config[key]=='object'){
+        $.config[key] = Object.assign($.config[key],config[key]);    
+      }
+      else $.config.key = config[key]; 
+    }
+    
+    // reload database defs
+    $.lib.db.load();
+  }  
+}
+
+module.exports.db = {
+  define: function(){
+    $.lib.db.load();  
+  }
 }
 
 module.exports.start = function(){
-  $.app.listen($.config.APP.port, () => {
+  try {
+    $.server = $.app.listen($.config.APP.port, () => {
+      
+      var msg = `Server started at port ${$.config.APP.port} with timer ${$.config.APP.timer_mins} mins.`; 
+      
+      // call 5 minute timer
+      if($.config.APP.timer_mins > 0) timer(function(day,hms){
+        // $.lib.user.sesscln();
+        $.timed = [...new Set($.timed)];
+        for(var idx in $.timed){
+          try{$.timed[idx]()}
+          catch(err){ce(`${$.timed[idx]}:${err}`)}
+        }
+        })
     
-    // call 5 minute timer
-    if($.config.APP.timer_mins > 0) timer(function(day,hms){
-      // user.sesscln();
-      $.timed = [...new Set($.timed)];
-      for(var idx in $.timed){
-        try{$.timed[idx]()}
-        catch(err){ce(`${$.timed[idx]}:${err}`)}
-      }
-      })
+    	cl(msg);
+    });
+    
+    return ({error:false,msg:msg})
+  }
   
-  	cl(`Server started at port ${$.config.APP.port} with timer ${$.config.APP.timer_mins} mins.`);
-  });
+  catch(e){
+    return {error:true,msg:e.message}
+  }
+}
+
+module.exports.stop = function(){
+  try {
+    $.server.close();
+    return ({error:false,msg:'Server stopped.'});
+  }
+  
+  catch(e){
+    return ({error:true,msg:e.message})
+  }  
+}
+
+// start if not run as a module.
+if (require.main === module) {
+  module.exports.nocache();
+  module.exports.start();
 }
 

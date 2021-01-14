@@ -350,7 +350,7 @@ module.exports.stop = function(){
 if($.ismod) $.lib.user.restore();
 
 // start if not run as a module.
-if ($.ismod) {
+if (!$.ismod) {
   module.exports.nocache();
   module.exports.start();
 }

@@ -1,5 +1,3 @@
-
-
 // logs
 global.cl = console.log;
 global.ce = console.error;
@@ -7,9 +5,6 @@ global.ci = console.info;
 
 const path = require('path');
 const express = require('express');
-
-global.__exe = process.execPath;
-cl('index.js execPath:',__exe); //index.js execPath: /root/.nvm/versions/node/v8.17.0/bin/node
 
 global.__abs = path.join(__dirname);
 if (__abs.match(/snapshot/)) {
@@ -355,7 +350,7 @@ module.exports.stop = function(){
 if($.ismod) $.lib.user.restore();
 
 // start if not run as a module.
-if (require.main === module) {
+if ($.ismod) {
   module.exports.nocache();
   module.exports.start();
 }

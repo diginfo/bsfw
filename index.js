@@ -1,3 +1,5 @@
+
+
 // logs
 global.cl = console.log;
 global.ce = console.error;
@@ -20,7 +22,7 @@ if (__abs.match(/snapshot/)) {
 cl('index.js __abs:',__abs); //index.js __abs: /usr/share/dev/nodejs/src/
 
 global.$ = {
-
+  ismod       : (require.main === module),
   isup        : true,
   os          : process.platform,
   isbin       : isbin,
@@ -90,18 +92,13 @@ $.app.use(session({
 
 
 function exitHandler(options, err) {
+  if(!$.ismod) process.exit();
   if(!$.isup) return;
   $.isup = false;
   $.lib.user.backup();
   process.exit();  
 }
 
-//Do something when app is closing
-/*
-process.on('exit', exitHandler.bind(null,{cleanup:true}));
-process.on('SIGINT', exitHandler.bind(null, {exit:true}));
-process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
-*/
 process.on('exit', exitHandler.bind(null,{cleanup:false}));
 process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
@@ -355,7 +352,7 @@ module.exports.stop = function(){
   }  
 }
 
-$.lib.user.restore();
+if($.ismod) $.lib.user.restore();
 
 // start if not run as a module.
 if (require.main === module) {

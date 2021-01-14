@@ -42,21 +42,17 @@
     "sqlite3": "^5.0.0",
     "tedious": "*"
   },
-  
   "pkg": {
-    
     "scripts": [
       "lib/**/*.js",
       "test/**/*.js"
     ],
-    
     "assets": [
       "public/**/*",
       "sql/**/*",
       "views/**/*"
     ]
   },
-
   "deprecated": false,
   "description": "Bootstrap Framework",
   "homepage": "https://github.com/diginfo/bsfw#readme",
@@ -70,5 +66,5 @@
     "private": true
   },
   "scripts": {},
-  "version": "0.0.1"
+  "version": "0.0.2"
 }

@@ -1,0 +1,18 @@
+{
+  "domain": null,
+  "_events": {},
+  "_eventsCount": 2,
+  "sessions": {
+    "domain": null,
+    "_events": {},
+    "_eventsCount": 2,
+    "sessions": {
+      "domain": null,
+      "_events": {},
+      "_eventsCount": 2,
+      "sessions": {},
+      "UUFXmOTeoK3r7ruG86r4JqIYBipymkyH": "{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"user\":\"SYSADM\",\"role\":\"admin\",\"menus\":[\"db\",\"em\",\"users\",\"cc\",\"ooo\",\"po\"]}"
+    },
+    "eVlGtDxIPpf42o_E6ETVorrF40943ig8": "{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"user\":\"SYSADM\",\"role\":\"admin\",\"menus\":[\"db\",\"em\",\"users\",\"cc\",\"ooo\",\"po\"]}"
+  }
+}

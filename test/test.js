@@ -1,8 +1,16 @@
 app = require('../');
 
+cl($.paths.cwd);
+
 var pho = require('../lib/pentaho');
 
 var test = {
+
+  backup: function(){
+    $.lib.user.backup();  
+    $.lib.user.restore(cl);
+    cl($.sstore.sessions)
+  },
 
   pho: function(){
     $.paths.pentaho.push($.path.join(__dirname,'./prpt'))
@@ -93,6 +101,7 @@ var test = {
 test.start();
 //test.timed();
 //test.pho();
+//test.backup();
 
 /*
 $.lib.fn.jsonPut($.path.join(__dirname,'config.json'),{

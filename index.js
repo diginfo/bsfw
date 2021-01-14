@@ -7,10 +7,9 @@ const path = require('path');
 const express = require('express');
 
 global.__exe = process.execPath;
-cl('index.js execPath:',__exe);
+cl('index.js execPath:',__exe); //index.js execPath: /root/.nvm/versions/node/v8.17.0/bin/node
 
-global.__abs = path.join(__dirname,'../');
-
+global.__abs = path.join(__dirname);
 if (__abs.match(/snapshot/)) {
   __abs = path.dirname(process.argv[0]);
   var isbin = true;
@@ -18,7 +17,11 @@ if (__abs.match(/snapshot/)) {
   isbin = false;
 }
 
+cl('index.js __abs:',__abs); //index.js __abs: /usr/share/dev/nodejs/src/
+
 global.$ = {
+  
+  isup        : true,
   os          : process.platform,
   isbin       : isbin,
   
@@ -34,6 +37,7 @@ global.$ = {
   lib         : {},
   
   paths: {
+    cwd     : process.cwd(),  /* execute from path */
     abs     : __abs,
     config  : path.join(__dirname,'./config.json'),
     views   : path.join(__dirname,'./views'),
@@ -83,6 +87,25 @@ $.app.use(session({
     maxAge            : 1000 * 60 * 15
   }
 }));
+
+
+function exitHandler(options, err) {
+  if(!$.isup) return;
+  $.isup = false;
+  $.lib.user.backup();
+  process.exit();  
+}
+
+//Do something when app is closing
+/*
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+*/
+process.on('exit', exitHandler.bind(null,{cleanup:false}));
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+
 
 // behaviours.
 module.exports.bhave = {
@@ -331,6 +354,8 @@ module.exports.stop = function(){
     return ({error:true,msg:e.message})
   }  
 }
+
+$.lib.user.restore();
 
 // start if not run as a module.
 if (require.main === module) {

@@ -20,7 +20,7 @@ if (__abs.match(/snapshot/)) {
 cl('index.js __abs:',__abs); //index.js __abs: /usr/share/dev/nodejs/src/
 
 global.$ = {
-  
+
   isup        : true,
   os          : process.platform,
   isbin       : isbin,

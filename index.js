@@ -6,7 +6,11 @@ global.ci = console.info;
 const path = require('path');
 const express = require('express');
 
+global.__exe = process.execPath;
+cl('index.js execPath:',__exe);
+
 global.__abs = path.join(__dirname,'../');
+
 if (__abs.match(/snapshot/)) {
   __abs = path.dirname(process.argv[0]);
   var isbin = true;
@@ -15,6 +19,7 @@ if (__abs.match(/snapshot/)) {
 }
 
 global.$ = {
+  os          : process.platform,
   isbin       : isbin,
   
   async       : require('async'),
@@ -25,7 +30,7 @@ global.$ = {
   pug         : require('pug'),
   
   timed       : [],
-  
+  bhave       : {},
   lib         : {},
   
   paths: {
@@ -33,6 +38,8 @@ global.$ = {
     config  : path.join(__dirname,'./config.json'),
     views   : path.join(__dirname,'./views'),
     lib     : path.join(__dirname,'./lib'),
+    data    : path.join(__abs,'./data'),
+    pentaho : [path.join(__abs,'./prpt')],
   },
   
   views     : [path.join(__dirname,'./views')],
@@ -76,6 +83,14 @@ $.app.use(session({
     maxAge            : 1000 * 60 * 15
   }
 }));
+
+// behaviours.
+module.exports.bhave = {
+  get:function(key){
+    if(key) return $.config.BHAVE[key];
+    return $.config.BHAVE;
+  }
+}
 
 // disable caching
 module.exports.nocache = function(){

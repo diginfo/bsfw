@@ -68,6 +68,8 @@ block content
       div.text-center
         img.img-fluid.w-100(src='img/dis.cologo.png' alt='Logo')
         p.font-weight-light.logo VISUAL PAS
+        
+    +pdf('')
 
 block script
   script.
@@ -78,8 +80,8 @@ block script
         data[item.name] = item.value || '';  
       })
       bs.ajaxGet('/login',data,function(res){
-        var lp = getCookie('lastPage');
-        if(res=='success' && lp) location.href = lp;  
+        var lp = getCookie('lastPage') || '/';
+        if(res=='success') location.href = lp;  
       }) 
     })
         

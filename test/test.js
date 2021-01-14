@@ -1,6 +1,26 @@
-var app = require('../');
+app = require('../');
+
+var pho = require('../lib/pentaho');
 
 var test = {
+
+  pho: function(){
+    $.paths.pentaho.push($.path.join(__dirname,'./prpt'))
+    
+    
+    var res = {
+      setHeader: cl,
+      end: cl
+    };
+    
+    var req = {
+      query:{_fname:'chart_test.prpt'}
+    } 
+    
+    pho.get(req,res,function(err){
+      cl(err)
+    });
+  },
   
   view: function(){
     app.view.define($.path.join(__dirname,'views'));
@@ -70,14 +90,15 @@ var test = {
 //test.sqlid();
 //test.lib();
 //test.api();
-//test.start();
+test.start();
 //test.timed();
+//test.pho();
 
-
+/*
 $.lib.fn.jsonPut($.path.join(__dirname,'config.json'),{
   APP:{
     XX:123
   }
 },cl)
 $.lib.fn.jsonGet($.path.join(__dirname,'config.json'),cl)
-
+*/

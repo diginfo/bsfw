@@ -10,6 +10,24 @@
     "users":{"text":"Users","id":"users","icon":"user"}
   },
 
+  "BHAVE": {
+    "pentaho":{
+      "host"  : "127.0.0.1",
+      "port"  : 9898,
+      "dbsrc" : "MYDEV"
+    }  
+    
+  },
+
+  "COMPANY":{
+    "name"      : "DiGiTaL Info Systems Pte Ltd",
+    "address_1" : "",
+    "address_2" : "",
+    "address_3" : "",
+    "address_4" : "",
+    "co_number" : ""
+  },
+
   "USERS": {
     "SYSADM":{
       "passwd": "kampong",

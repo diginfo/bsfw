@@ -374,7 +374,7 @@ module.exports = Object.assign(module.exports,{
       mex.server.close(function(cb){
         ci('Stopping Server...');
         mex.lib.user.backup();
-        if(cb) return cb({error:false,msg:'Server stopped.'});
+        // if(cb) return cb({error:false,msg:'Server stopped.'});
         process.exit();
       });
     }

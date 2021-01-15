@@ -1,11 +1,7 @@
 app = require('../');
-
-cl($.paths.cwd);
-
 var pho = require('../lib/pentaho');
 
 var test = {
-
   backup: function(){
     $.lib.user.backup();  
     $.lib.user.restore(cl);
@@ -31,7 +27,7 @@ var test = {
   },
   
   view: function(){
-    app.view.define($.path.join(__dirname,'views'));
+    app.define.view($.path.join(__dirname,'views'));
     test.render('test');
   },
   
@@ -46,20 +42,26 @@ var test = {
   },
   
   lib: function(){
-    app.lib.define('test',$.path.join(__dirname,'sqlid.js'));
+    app.define.lib('test',$.path.join(__dirname,'sqlid.js'));
     $.lib.test.techo.get({hello:'world'},cl);  
   },
   
-  config: function(){
-    app.config.define($.path.join(__dirname,'config.json'));
+  configDefine: function(){
+    app.define.config($.path.join(__dirname,'config.json'));
     cl(JSON.stringify($.config,null,2));
+  },
+
+  configSet: function(){
+    test.configDefine();
+    cl(app.put.config({'APP':{"title":args[0] || 'xxx'}}));
+    cl(app.get.config('APP'));
   },
   
   sqlid:function(){
     var spath = $.path.join(__dirname,'sqlid.js'); 
-    app.sqlid.define(require(spath));
+    app.define.sqlid(require(spath));
     //cl($.lib.sqlid);
-    app.sqlid.get('techo',{hello:'world'},cl);
+    app.get.sqlid('techo',{hello:'world'},cl);
   },
   
   render: function(page='index'){
@@ -74,40 +76,40 @@ var test = {
     setTimeout(function(){
       cl(app.stop());
       $.lib.fn.x('quitting...')
-    },ms)
+    },ms);
   },
 
   timed: function(){
-    test.config();
+    test.configSet();
     var ttest = function(){
       cl('Timer Done.');
       process.exit();
     } 
     
-    app.timed.define(ttest);
+    app.define.timed(ttest);
     app.start();
     
   }
     
 }
 
-//test.view()
-//test.render();
-//test.startStop(2000)
-//test.config();
-//test.sqlid();
-//test.lib();
-//test.api();
-test.start();
-//test.timed();
-//test.pho();
-//test.backup();
+// command line args
+const args = process.argv.slice(2).filter(function(e){return e});
 
-/*
-$.lib.fn.jsonPut($.path.join(__dirname,'config.json'),{
-  APP:{
-    XX:123
-  }
-},cl)
-$.lib.fn.jsonGet($.path.join(__dirname,'config.json'),cl)
-*/
+if(1==2){
+  test.view()
+  test.render();
+  //
+  test.configDefine();
+  test.sqlid();
+  test.lib();
+  test.api();
+  //test.start();
+  test.timed();
+  test.pho();
+  test.backup();
+  test.configSet();
+}
+
+test.start();
+

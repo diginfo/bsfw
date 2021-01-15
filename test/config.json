@@ -1,8 +1,8 @@
 {
   "APP": {
     "license": "",
-    "port": 8181,
-    "timer_mins": 1,
-    "title": "TEST-SERVER"
+    "port": 8123,
+    "timer_mins": 15,
+    "title": "xxx"
   }
 }

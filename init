@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+STAMP=`date "+%y%m%d-%H%M%S"`
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+HOME="$MYDIR../";
+
+function _mkdir {
+  _usage $# 1 "_mkdir path/to/make"
+  if [ ! -d "$1" ]; then
+    mkdir -p $1;
+  fi  
+}
+
+_mkdir $HOME/node_modules
+_mkdir $HOME/views
+_mkdir $HOME/lib
+_mkdir $HOME/data
+
+

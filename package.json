@@ -50,7 +50,8 @@
     "assets": [
       "public/**/*",
       "sql/**/*",
-      "views/**/*"
+      "views/**/*",
+      "config.json"
     ]
   },
   "deprecated": false,
@@ -66,5 +67,5 @@
     "private": true
   },
   "scripts": {},
-  "version": "0.0.7"
+  "version": "0.0.8"
 }

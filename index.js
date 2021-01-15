@@ -343,6 +343,8 @@ module.exports = Object.assign(module.exports,{
         
         var msg = `Server started at port ${mex.config.APP.port} with timer ${mex.config.APP.timer_mins} mins.`; 
         
+        ci(mex.path);
+        
         // restore session
         mex.lib.user.restore();
         

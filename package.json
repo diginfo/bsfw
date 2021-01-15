@@ -51,7 +51,8 @@
       "public/**/*",
       "sql/**/*",
       "views/**/*",
-      "config.json"
+      "config.json",
+      "data/session.json"
     ]
   },
   "deprecated": false,

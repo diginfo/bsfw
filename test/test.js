@@ -1,33 +1,34 @@
 app = require('../');
-var pho = require('../lib/pentaho');
+module.exports.app = app;
 
 var test = {
   backup: function(){
-    $.lib.user.backup();  
-    $.lib.user.restore(cl);
-    cl($.sstore.sessions)
+    app.lib.user.backup();  
+    app.lib.user.restore(cl);
+    cl(app.sstore.sessions)
   },
 
   pho: function(){
-    $.paths.pentaho.push($.path.join(__dirname,'./prpt'))
+    app.path.prpt.push(app.mod.path.join(__dirname,'./prpt'))
     
     
     var res = {
-      setHeader: cl,
-      end: cl
+      setHeader : cl,
+      end       : cl,
+      write     : cl
     };
     
     var req = {
       query:{_fname:'chart_test.prpt'}
     } 
     
-    pho.get(req,res,function(err){
+    app.lib.pho.get(req,res,function(err){
       cl(err)
     });
   },
   
   view: function(){
-    app.define.view($.path.join(__dirname,'views'));
+    app.define.view(app.mod.path.join(__dirname,'views'));
     test.render('test');
   },
   
@@ -42,13 +43,13 @@ var test = {
   },
   
   lib: function(){
-    app.define.lib('test',$.path.join(__dirname,'sqlid.js'));
-    $.lib.test.techo.get({hello:'world'},cl);  
+    app.define.lib('test',app.mod.path.join(__dirname,'sqlid.js'));
+    app.lib.test.techo.get({hello:'world'},cl);  
   },
   
   configDefine: function(){
-    app.define.config($.path.join(__dirname,'config.json'));
-    cl(JSON.stringify($.config,null,2));
+    app.define.config(app.mod.path.join(__dirname,'config.json'));
+    cl(JSON.stringify(app.config,null,2));
   },
 
   configSet: function(){
@@ -58,9 +59,9 @@ var test = {
   },
   
   sqlid:function(){
-    var spath = $.path.join(__dirname,'sqlid.js'); 
+    var spath = app.mod.path.join(__dirname,'sqlid.js'); 
     app.define.sqlid(require(spath));
-    //cl($.lib.sqlid);
+    //cl(app.lib.sqlid);
     app.get.sqlid('techo',{hello:'world'},cl);
   },
   
@@ -75,7 +76,7 @@ var test = {
     cl(app.start());
     setTimeout(function(){
       cl(app.stop());
-      $.lib.fn.x('quitting...')
+      app.lib.fn.x('quitting...')
     },ms);
   },
 
@@ -111,5 +112,15 @@ if(1==2){
   test.configSet();
 }
 
+
+app.express.get('/pho',function(req,res,next){
+  cl('xxxx');
+  app.lib.pho.get(req,res,function(err){
+    
+  });    
+})
+
+//test.sqlid();
 test.start();
+//test.pho();
 

@@ -27,10 +27,10 @@ mixin nav-drop-item(text,href)
   a.dropdown-item(href=href)=text
 
 if session && session.menus
-  +nav($.config.APP.title || 'Visual PAS')
+  +nav(config.APP.title || 'BS-FW')
     +nav-item('Home','/','home')
     each path in session.menus
-      - var item = $.config.MENUS[path];
+      - var item = app.config.MENUS[path];
       if item  
         +nav-item(item.text,path,item.icon)
     +nav-item('Logout','/logout','sign-out-alt')

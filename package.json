@@ -52,7 +52,7 @@
       "sql/**/*",
       "views/**/*",
       "config.json",
-      "data/session.json"
+      "data/**/*"
     ]
   },
   "deprecated": false,

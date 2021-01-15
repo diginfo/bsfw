@@ -76,7 +76,7 @@ var test = {
     cl(app.start());
     setTimeout(function(){
       cl(app.stop());
-      app.lib.fn.x('quitting...')
+      //app.lib.fn.x('quitting...')
     },ms);
   },
 
@@ -112,15 +112,17 @@ if(1==2){
   test.configSet();
 }
 
-
+/*
 app.express.get('/pho',function(req,res,next){
   cl('xxxx');
   app.lib.pho.get(req,res,function(err){
     
   });    
 })
+*/
 
 //test.sqlid();
-test.start();
+//test.start();
 //test.pho();
+test.startStop();
 

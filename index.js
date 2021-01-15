@@ -57,7 +57,6 @@ mex.timed = [];
 
 // Custom Module Libs
 function libinit(){
-
   mex.lib = {};
   mex.lib.fn     = require(mex.mod.path.join(mex.path.lib,'./fn.js'));
   mex.lib.db     = require(mex.mod.path.join(mex.path.lib,'./db'));
@@ -201,11 +200,9 @@ module.exports = Object.assign(module.exports,{
   onExit: function(options, err) {
     if(!mex.flag.isup) return;
     mex.flag.isup = false;
-    if(mex.flag.serving) {
-      mex.lib.user.backup();
-      module.exports.stop()
-    }
-    process.exit();  
+    module.exports.stop(function(){
+      process.exit();
+    }); 
   },
   
   // disable caching
@@ -346,6 +343,7 @@ module.exports = Object.assign(module.exports,{
         
         var msg = `Server started at port ${mex.config.APP.port} with timer ${mex.config.APP.timer_mins} mins.`; 
         
+        // restore session
         mex.lib.user.restore();
         
         // call 5 minute timer
@@ -371,11 +369,14 @@ module.exports = Object.assign(module.exports,{
     }
   },
   
-  stop: function(){
+  stop: function(cb){
     try {
-      mex.server.close();
-      mex.flag.serving = false;
-      return ({error:false,msg:'Server stopped.'});
+      mex.server.close(function(cb){
+        ci('Stopping Server...');
+        mex.lib.user.backup();
+        if(cb) return cb({error:false,msg:'Server stopped.'});
+        process.exit();
+      });
     }
     
     catch(e){

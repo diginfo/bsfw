@@ -26,7 +26,7 @@ mex.debug = false;
 mex.flag = {
   serving     : false,
   ismod       : (require.main != module),
-  isup        : true,
+  stopping    : false,
   os          : process.platform,
   isbin       : _isbin
 }
@@ -37,11 +37,10 @@ mex.path = {
   abs     : __abs,                                // /usr/share/dev/nodejs/src/bsfws
   
   // In pkg these are all relative: to /snapshot 
-  top     : __top,                                //  /snapshot/bsfw'*/ 
   config  : mex.mod.path.join(__dirname,'./config.json'), //  /snapshot/bsfw/config.json
   lib     : mex.mod.path.join(__dirname,'./lib'),         //  /snapshot/bsfw/lib
   data    : mex.mod.path.join(__dirname,'./data'),        //  /snapshot/bsfw/data
-  prpt    : [mex.mod.path.join(__top,'./prpt')],          //  [/snapshot/bsfw/prpt]
+  prpt    : [mex.mod.path.join(__abs,'./prpt')],          //  [/snapshot/bsfw/prpt]
 
   views   : [mex.mod.path.join(__dirname,'./views')],
   public  : [mex.mod.path.join(__dirname,'./public')],
@@ -83,7 +82,7 @@ function expinit(){
   mex.path.public.map(function(pub){
     mex.express.use(express.static(pub));    
   })
-  //mex.express.use(express.static(mex.path.public));
+
   // mex.express.use(require('cookie-parser')());
   mex.express.use(require('body-parser').json());
   mex.express.use(require('body-parser').urlencoded({ extended: false }));
@@ -198,11 +197,18 @@ function timer(cb,delay){
 module.exports = Object.assign(module.exports,{
   
   onExit: function(options, err) {
-    if(!mex.flag.isup) return;
-    mex.flag.isup = false;
+    if(mex.flag.stopping) return;
+    mex.flag.stopping = true;
+    
+    var tout = setTimeout(function(){
+      process.exit();  
+    })
+    
+    // force-stop after 5 seconds.
     module.exports.stop(function(){
+      clearTimeout(tout);
       process.exit();
-    }); 
+    },5000); 
   },
   
   // disable caching
@@ -269,7 +275,7 @@ module.exports = Object.assign(module.exports,{
       mex.lib.db.load();
     },
 
-    define: function(){
+    db: function(){
       mex.lib.db.load();  
     },
     
@@ -286,8 +292,12 @@ module.exports = Object.assign(module.exports,{
       if(mex.timed.indexOf(fnid) < 0) mex.timed.push(fnid);
     },    
     
+    // append a sqlid to the lib/sqlid.js object
     sqlid: function(lib){
-      mex.lib.sqlid = Object.assign(mex.lib.sqlid,lib)
+      try {
+        if(typeof(lib)=='string') lib = require(lib);
+        mex.lib.sqlid = Object.assign(mex.lib.sqlid,lib);
+      } catch(e){ce(e.message)}
     },
     
   },
@@ -299,7 +309,7 @@ module.exports = Object.assign(module.exports,{
       return mex.config.BHAVE;
     },
   
-    config:function(key){
+    config: function(key){
       if(key) return mex.config[key];
       return mex.config;
     }, 
@@ -311,6 +321,7 @@ module.exports = Object.assign(module.exports,{
   },
 
   put: {
+    
     sqlid: function(id,qry,cb){
       mex.lib.sqlid[id].put(qry,cb);  
     },    
@@ -318,7 +329,7 @@ module.exports = Object.assign(module.exports,{
     // this might be one table or all !
     config:function(data){
       mex.config = mex.lib.fn.jsonPut(mex.path.config,data);
-      mex.lib.db.load(); 
+      mex.lib.db.load(); // always reload the databases. 
       return mex.config; 
     },
 
@@ -340,10 +351,7 @@ module.exports = Object.assign(module.exports,{
 
     try {
       mex.server = mex.express.listen(mex.config.APP.port, () => {
-        
         var msg = `Server started at port ${mex.config.APP.port} with timer ${mex.config.APP.timer_mins} mins.`; 
-        
-        ci(mex.path);
         
         // restore session
         mex.lib.user.restore();
@@ -359,6 +367,7 @@ module.exports = Object.assign(module.exports,{
           })
       
       	ci(msg);
+      	ci(mex.path);
       	mex.flag.serving = true;
       });
       
@@ -376,7 +385,6 @@ module.exports = Object.assign(module.exports,{
       mex.server.close(function(cb){
         ci('Stopping Server...');
         mex.lib.user.backup();
-        // if(cb) return cb({error:false,msg:'Server stopped.'});
         process.exit();
       });
     }

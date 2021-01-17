@@ -11,14 +11,30 @@
   }
 
 
-mixin pdf(path)
-  #modal-pdf.modal.fade
+mixin report(path)
+  #modal-report.modal.fade
     .modal-dialog.modal-lg(role='document')
       .modal-content
         .modal-body
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') ×
-          object(type='application/pdf' data=path width='100%' height='500' style='height: 85vh;') No Support
+          object(type='application/pdf' data=path width='100%' height='500' style='height: 85vh;') Not Supported
+
+mixin repopt(path)
+  #modal-repopt.modal.fade
+    .modal-dialog.modal-sm(role='document')
+      .modal-content
+        .modal-body
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') ×
+          br
+          form
+            +fitem({text:'Format'},{type:'combo',id:'rep_format',required:true,data:[{value:'pdf',text:'PDF View'},{value:'html',text:'HTML View'},{value:'excel',text:'XLSX Download'}]})
+            br
+            div.text-center
+              +button('Go',{color:'green',icon:'print'})
+              +button('Cancel',{id:'repop_go',color:'blue'})
+          
 
 mixin fieldset(text)
   -text=text || '';
@@ -74,7 +90,7 @@ mixin button(text,arg)
   -
     arg=arg||{};
     var color=arg.color||'primary'; delete arg.color;
-  button(type="button" class=`btn btn-${color}`)&attributes(arg)
+  button(type="button" class=`btn btn-${colmap[color]}`)&attributes(arg)
     =text
 
 mixin label(arg)

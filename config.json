@@ -7,25 +7,36 @@
   },
   
   "MENUS": {
-    "users":{"text":"Users","id":"users","icon":"user"}
+    "users":{"text":"Users","id":"users","icon":"user","default":true},
+    
+    "reports":{
+      "text":"Reports",
+      "id":"reports",
+      "icon":"print",
+      "children":{
+        "ms_in_part":{"text":"Visual Part List","id":"ms_inv_part","href":"javascript:report('pho/pdf/vmfg/ms_inv_part');"}
+      }
+    }
   },
 
   "BHAVE": {
     "pentaho":{
-      "host"  : "127.0.0.1",
-      "port"  : 9898,
-      "dbsrc" : "MYDEV"
-    }  
-    
+      "host"        : "127.0.0.1",
+      "port"        : 9898,
+      "dbsrc"       : "MYDEV",
+      "image_path"  : "public/img"
+    }
   },
 
   "COMPANY":{
-    "name"      : "DiGiTaL Info Systems Pte Ltd",
-    "address_1" : "",
-    "address_2" : "",
-    "address_3" : "",
-    "address_4" : "",
-    "co_number" : ""
+    "co_name"     : "DiGiTaL Info Systems Pte Ltd",
+    "co_alias"    : "DIS",
+    "co_add_1"    : "",
+    "co_add_2"    : "",
+    "co_add_3"    : "",
+    "co_tel"      : "",
+    "co_url"      : "",
+    "co_reg"      : ""
   },
 
   "USERS": {
@@ -47,9 +58,9 @@
   },
 
   "ROLES": {
-    "super": ["em","cc","ooo","po"],
-    "user": ["po"],
-    "admin": ["db","em","users","cc","ooo","po"]
+    "super": ["reports","em","cc","ooo","po"],
+    "user": ["reports","po"],
+    "admin": ["reports","db","em","users","cc","ooo","po"]
   },
 
   "SQLITE": {

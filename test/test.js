@@ -11,15 +11,19 @@ var test = {
   pho: function(){
     app.path.prpt.push(app.mod.path.join(__dirname,'./prpt'))
     
-    
     var res = {
-      setHeader : cl,
-      end       : cl,
-      write     : cl
+      setHeader : function(x,y){cl(x,y)},
+      end       : function(x,y){cl(x,y)},
+      write     : function(x,y){cl(x.toString())},
     };
     
     var req = {
-      query:{_fname:'chart_test.prpt'}
+      path  : '/pho/html/vmfg/ms_inv_part',
+      query : {
+        base_id     : 'WLH-0000219',
+        START_BASE  : 'WLH-0000219',
+        END_BASE    : 'WLH-0000219',
+      }
     } 
     
     app.lib.pho.get(req,res,function(err){
@@ -122,7 +126,9 @@ app.express.get('/pho',function(req,res,next){
 */
 
 //test.sqlid();
-//test.start();
+test.start();
 //test.pho();
-test.startStop();
+//test.startStop();
+
+//app.get.sqlid()
 

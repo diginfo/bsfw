@@ -17,23 +17,39 @@ mixin nav-item(text,href,icon)
         i.fa(class=`fa-${icon}`)
       span=text
 
-mixin nav-drop(text)
+mixin nav-drop(text,icon)
   li.nav-item.dropdown
-    a#navbarDropdown.nav-link.dropdown-toggle(href='#' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')=text
+    a#navbarDropdown.nav-link.dropdown-toggle(href='#' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')
+      if icon
+        i.fa(class=`fa-${icon}`)
+      span=text
     .dropdown-menu(aria-labelledby='navbarDropdown')
       block
 
-mixin nav-drop-item(text,href)
-  a.dropdown-item(href=href)=text
+mixin nav-drop-item(child)
+  a.dropdown-item(href=child.href)=child.text
+  if child.icon
+    i.fa(class=`fa-${child.icon}`)
 
 if session && session.menus
   +nav(config.APP.title || 'BS-FW')
     +nav-item('Home','/','home')
     each path in session.menus
       - var item = app.config.MENUS[path];
-      if item  
-        +nav-item(item.text,path,item.icon)
+      if item
+        if item.children
+          +nav-drop(item.text,item.icon)
+            each child in item.children
+              +nav-drop-item(child)
+        else 
+          +nav-item(item.text,path,item.icon)
     +nav-item('Logout','/logout','sign-out-alt')
+
+script.
+  function report(id){
+    $('#modal-pdf object').attr('data',id);
+    $('#modal-pdf').modal('show');
+  }
       
 //-
   +nav-item('home','Home','/','home')

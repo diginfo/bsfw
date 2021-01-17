@@ -124,12 +124,8 @@ function expinit(){
     next()
   })
 
-  mex.express.get('/pho',function(req,res,next){
-    cl('xxxx');
-    mex.lib.pho.get(req,res,function(err){
-      
-    });    
-  });
+  // Pentaho endpoint.
+  mex.express.get('/pho/*',mex.lib.pho.get);
   
   // Login endpoint
   mex.express.get('/login',mex.lib.user.login);

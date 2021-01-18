@@ -1,0 +1,603 @@
+#!/bin/bash
+
+## GLOBS
+########
+_HELP="";
+_DBUG="";
+
+## PATHS
+########
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+## COLOUR FORMATS
+#################
+RESTORE=$(echo -en '\001\033[0m\002')
+RED=$(echo -en '\001\033[00;31m\002')
+GREEN=$(echo -en '\001\033[00;32m\002')
+YELLOW=$(echo -en '\001\033[00;33m\002')
+BLUE=$(echo -en '\001\033[00;34m\002')
+MAGENTA=$(echo -en '\001\033[00;35m\002')
+PURPLE=$(echo -en '\001\033[00;35m\002')
+CYAN=$(echo -en '\001\033[00;36m\002')
+LGREY=$(echo -en '\001\033[00;37m\002')
+LRED=$(echo -en '\001\033[01;31m\002')
+LGREEN=$(echo -en '\001\033[01;32m\002')
+LYELLOW=$(echo -en '\001\033[01;33m\002')
+LBLUE=$(echo -en '\001\033[01;34m\002')
+LMAGENTA=$(echo -en '\001\033[01;35m\002')
+LPURPLE=$(echo -en '\001\033[01;35m\002')
+LCYAN=$(echo -en '\001\033[01;36m\002')
+WHITE=$(echo -en '\001\033[01;37m\002')
+
+##TEXT
+ULINE=$(echo -en '\e[4m')
+BOLD=$(echo -en '\e[1m')
+ITALIC=$(echo -en '\e[3m')
+
+## BACKGROUND
+BRED=$(echo -en '\001\033[00;41m\002')
+BGREEN=$(echo -en '\001\033[00;42m\002')
+BYELLOW=$(echo -en '\001\033[00;43m\002')
+BBLUE=$(echo -en '\001\033[00;44m\002')
+BMAGENTA=$(echo -en '\001\033[00;45m\002')
+BPURPLE=$(echo -en '\001\033[00;45m\002')
+BCYAN=$(echo -en '\001\033[00;46m\002')
+BLGREY=$(echo -en '\001\033[00;47m\002')
+BLRED=$(echo -en '\001\033[01;41m\002')
+BLGREEN=$(echo -en '\001\033[01;42m\002')
+BLYELLOW=$(echo -en '\001\033[01;43m\002')
+BLBLUE=$(echo -en '\001\033[01;44m\002')
+BLMAGENTA=$(echo -en '\001\033[01;45m\002')
+BLPURPLE=$(echo -en '\001\033[01;45m\002')
+BLCYAN=$(echo -en '\001\033[01;46m\002')
+BWHITE=$(echo -en '\001\033[01;47m\002')
+
+# echo ${RED}RED${GREEN}GREEN${YELLOW}YELLOW${BLUE}BLUE${PURPLE}PURPLE${CYAN}CYAN${WHITE}WHITE${RESTORE}
+
+## BINS
+#######
+JQ="/usr/bin/jq";
+PS="/bin/ps";
+PIDOF="$(/usr/bin/which pidof)"
+TR="$(/usr/bin/which tr)";
+AWK="$(/usr/bin/which awk)";
+TAIL="$(/usr/bin/which tail)";
+GIT="$(/usr/bin/which git)";
+TAR="$(/usr/bin/which tar)";
+GZIP="$(/usr/bin/which gzip)";
+CHMOD="$(/usr/bin/which chmod)";
+MV="$(/usr/bin/which mv)";
+CP="$(/usr/bin/which cp)";
+CD="$(/usr/bin/which cd)";
+SED="$(/usr/bin/which sed)";
+NANO="$(/usr/bin/which nano)";
+APT="$(/usr/bin/which apt)";
+SQLITE="$(/usr/bin/which sqlite3)";
+SQLITE3="$(/usr/bin/which sqlite3)";
+MYSQL="$(/usr/bin/which mysql)";
+SCON="$(/usr/bin/which systemctl)";
+JCON="$(/usr/bin/which journalctl)";
+BNAME="$(/usr/bin/which basename)";
+CURL="$(/usr/bin/which curl)";
+S3CMD="$(/usr/bin/which s3cmd)";
+
+## CONSOLE OUTPUT
+#################
+
+## $1:'%-20s %-2s %-10s' $2 $3 $4 $5...
+function _tablerow {
+
+  if [ ! "$_TBLSTYLES" ];then
+    _TBLSTYLES=$1;
+    shift;
+  fi
+  
+  local COLS=("$@");
+  printf "$_TBLSTYLES\n" "${COLS[@]}" 
+}
+
+## $1:'%-20s %-2s %-10s' $2 $3 $4 $5...
+function _tablehead {
+  if [ "$_TBLSTYLES" ];then
+    return
+  fi
+
+  _TBLSTYLES=$1;
+  shift;
+  
+  local COLS=("$@");
+  printf "${BBLUE}${BOLD}"
+  printf "$_TBLSTYLES" "${COLS[@]}"
+  
+  printf "${RESTORE}\n"
+}
+
+function _cmdlog {
+  echo -ne "$line\e[K" # \e[K cleans the residues of the previous output.
+  echo -e "\e[1A" # moving the cursor back to the previously printed line
+  printf "$1";
+}
+
+# $1VARS-SENT, $1=VARS-REQD,$3:err-Message
+function _usage {
+  
+  if [ "$_HELP" ];then
+    _exit "pure3 $3";
+
+  elif [ $1 -lt $2 ]; then
+    USAGE="USAGE: "
+    _exit "$USAGE$3";
+  fi; 
+}
+
+function _test {
+  _usage $# 1 "Test requires 1 arg"
+  exit 0;
+}
+
+function _readme {
+  $MYDIR/glow README.md
+}
+
+## echo $1:message, $2:
+function _echo {
+  printf $@
+}
+
+function _dbug {
+  if [ "$_DBUG" ];then
+    printf "${YELLOW}$1${RESTORE}\n"
+  fi
+}
+
+function _error {
+  printf "${LRED}$1${RESTORE}\n"
+}
+
+function _alert {
+  printf "${CYAN}$1${RESTORE}\n"
+}
+
+function _warn {
+  printf "${LPURPLE}$1${RESTORE}\n"
+}
+
+function _success {
+  printf "${YELLOW}$1${RESTORE}\n"
+}
+
+## $1:message
+function _exit {
+  _error "$1";
+  exit 1;
+}
+
+function _quit {
+  _exit $@;
+}
+
+## Prompt Continue
+function _confirm {
+  local MSG="$1"
+  if [ ! "$1" ]; then
+    MSG="Continue";  
+  fi
+  read -p "${LRED}$MSG Y/N? " -n 1 -r
+  echo ${RESTORE};
+  if [[ $REPLY =~ ^[Nn]$ ]]; then
+    _exit "Quitting."
+  fi
+}
+
+## Prompt Wait ($1)
+PROMPT="Y"
+function _wait {
+  echo
+  echo "$1"
+  if [[ $PROMPT =~ ^[Nn]$ ]]; then
+    return;
+  fi
+  _confirm;
+}
+
+## DATE-TIME
+############
+
+# local JSDATE="Fri Dec 25 2020 04:00:00 GMT+0800 (+08)";
+#read dow day mon year hms oset<<< "$JSDATE";
+#DATE=$(date -d "$mon $day $year $hms" "+%Y-%m-%d $hms");
+
+function _stamp {
+  local DATE=`date "+%y%m%d-%H%M%S"`;
+  printf "$DATE";
+}
+
+function _jstime {
+  _usage $# 1 "jstime [YYYY-MM-DD HH:MM:SS] - Returns Javascript Time.";
+  local DATE=$(date -d "$1" +%s);
+  printf $(( DATE*1000 ))
+}
+
+function _dow {
+  local DOW="$(date +"%a")"
+  printf "$DOW";
+}
+
+function _now {
+  local NOW=$(date +%H:%M);
+  printf "$NOW";
+}
+
+## $1:Time > NOW
+function _gtnow {
+  local NOW=`_now`;
+  if [[ "$NOW" > "$1" ]]; then
+    printf 'Y'
+  else
+    printf 'N'
+  fi   
+}
+
+## $1:Time < NOW
+function _ltnow {
+  local NOW=`_now1`;
+  if [[ "$NOW" < "$1" ]]; then
+    printf 'Y'
+  else
+    printf 'N'
+  fi   
+}
+
+
+## MISC
+#######
+
+function _encode {
+  local string="${1}"
+  local strlen=${#string}
+  local encoded=""
+  local pos c o
+
+  for (( pos=0 ; pos<strlen ; pos++ )); do
+     c=${string:$pos:1}
+     case "$c" in
+        [-_.~a-zA-Z0-9] ) o="${c}" ;;
+        * )               printf -v o '%%%02x' "'$c"
+     esac
+     encoded+="${o}"
+  done
+  echo "${encoded}"    # You can either set a return variable (FASTER) 
+  # REPLY="${encoded}"   #+or echo the result (EASIER)... or both... :p
+}
+
+## $1:to $2:from $3:subject $4:body
+function _mail {
+  _usage $# 4 "mail [to from subject body] - Send an email message";
+  echo -e "$4" | mail -s "$3" $1 -aFrom:$2 
+}
+
+function _reverse {
+  echo "$1" | tac;
+}
+
+#1: STRING, $2:FIND, $3:REPLACE
+function _replace {
+  local NEW=${1//$2/$3}
+  printf "$NEW";
+}
+
+## $1:HAYSTACK $2:NEEDLE
+function _contains {
+  if [ "$2" ] && [[ "$1" =~ .*"$2".* ]]; then 
+    printf "Y"
+  else
+    printf "N"
+  fi
+}
+
+## $1:number, $2:decimal places
+function _decs {
+  DP=$2;
+  printf "%0.${DP}f" $1;
+}
+
+## $1:PORT, $2:args
+function _locget {
+  _usage $# 2 "locget [port,args] - Execute an API call by PORT and ARG.";
+  local RES="$($CURL -s "http://localhost:$1/?$2")";
+  printf '%s' "$RES"
+}
+
+# $1:NAME $2:VALUE
+function _exitnull {
+  # echo "NAME:$1 VAL:$2"
+  _usage $# 2 "exitnull [KEY,VALUE] - exit if VALUE is null.";
+  if [ "$2" == "" ] || [ "$2" == "exitnull0" ];then
+    _exit "$1 cannot be null";
+  fi
+}
+
+function _portfree {
+  _usage $# 1 "portfree [port-no] - Check if PORT is listening.";
+  local LSOF="$(/usr/bin/which lsof)";
+  local FREE="$($LSOF -i:$1)";
+  if [ "$FREE" ];then
+    printf 'N';
+  else
+    printf 'Y';
+  fi
+}
+
+function _isdev {
+  local HN="$(hostname)"
+  if [ "$HN" == "mydev" ];then
+    _exit "Cannot install on $HN."
+  fi
+}
+
+## $1:string
+function _upper {
+  _usage $# 1 "_upper [string] - Convert string to uppercase";
+  printf "$1" | tr [a-z] [A-Z];
+}
+
+## $1:string
+function _lower {
+  _usage $# 1 "_lower [string] - Convert string to lowercase";
+  printf "$1" | tr [A-Z] [a-z];
+}
+
+function _gethost {
+  printf `hostname`;
+}
+
+function _sethost {
+  export LC_ALL="en_US.UTF-8"
+  read -p "Enter Hostname: " HOST
+  hostnamectl set-hostname $HOST
+  echo "127.0.0.1 $HOST" >> /etc/hosts
+  printf "$HOST" /etc/hostname;
+  # dpkg-reconfigure tzdata
+}
+
+# $1:path/to/file
+function _nano {
+  _usage $# 1 "_nano path/to/file";
+  if [ ! -f "$1" ];then
+    _exit "$1 does not exist."  
+  else
+    $NANO $1;
+  fi
+}
+
+## PREVENT SSH LOCALE ISSUES
+function _locale {
+  $SED -e '/SendEnv/ s/^#*/#/' -i /etc/ssh/ssh_config
+}
+
+function _osver {
+  printf "$(cat /etc/os-release | grep "PRETTY_NAME")";
+}
+
+function _myip {
+  printf "$(printenv SSH_CLIENT | awk '{print $1}')";  
+}
+
+## $1:PATH
+function _jsonvalid {
+  _usage $# 1 "_jsonvalid [PATH]";
+  if jq empty $1 2>/dev/null; then
+    printf "Y";
+  else
+    printf "N";
+  fi  
+}
+
+## $1:JSON String
+function _jsonparse {
+  _usage $# 1 "_jsonparse [STRING] - validate & convert JSON string into pretty JSON.";
+  printf "$1" | $JQ;
+}
+
+## $1:PATH $2:KEY $3:VALUE
+function _jsonput {
+  _usage $# 3 "_jsonput [PATH KEY VALUE]";
+  local JPATH=$1;
+  local KEY=$2;
+  local VAL=$3
+  if [ ! -f $JPATH ];then
+    _exit "$JPATH not found."
+  fi
+  contents=`jq ".$KEY = \"$VAL\"" $JPATH` && echo "${contents}" > $JPATH;
+}
+
+## $1:JSON-DATA, $2:key.string
+function _jsonkv {
+  printf "$1" | $JQ .$2;  
+}
+
+## Get JSON value by json path & key.
+function _jsonget {
+
+  local PATH=$1;
+  local KEY=$2;
+
+  _usage $# 2 "_jsonget [PATH KEY]";
+  
+  if [ ! -f "$PATH" ]; then
+    _error "$PATH file not found.";
+    exit 0;
+  fi
+  
+  VAL=$($JQ -r .$KEY $PATH);
+  printf $VAL;  
+}
+
+# jsonval env/template.json.off SITEID
+
+function _isnum {
+  _usage $# 1 "_isnum string/number";
+  
+  re='^[0-9]+$'
+  if [[ $1 =~ $re ]] ; then
+    printf "Y"
+  else
+    printf "N"
+  fi
+}
+
+## GIT
+######
+
+function _gitclone {
+  _usage $# 1 "_gitclone remote-repo-url" 
+  $GIT clone $1;
+}
+
+## $1:Path-to-repo
+function _gituser {
+
+  if [ ! -d "$1" ]; then
+    _exit "Folder $1 does not exist."
+  fi
+  
+  cd $1;
+  
+  __HN=$(_gethost);
+  $GIT config user.email "$__HN@puremfg.net";
+  $GIT config user.name "$__HN"; 
+}
+
+## Fix Remote $1:REPO-NAME 2:LOCAL-FOLDER;
+function _gitremote {
+  _usage $# 2 "_gitremote repo-name local/repo/path" 
+  
+  local REPO=$1;
+  local FOLD=$2;
+  
+  if [ ! -d "$FOLD" ]; then
+    _exit "Folder $FOLD does not exist."
+  fi
+  
+  cd $FOLD;
+  
+  if [ "$($GIT remote -v | grep '(fetch)')" != "origin	$REPO (fetch)" ]; then
+    _alert "Setting Remote URLs ...";
+    $GIT remote set-url origin "$REPO";
+    $GIT remote set-url origin "" --push;
+  fi
+}
+
+## $1:path/to/repo
+function _gitreset {
+  _usage $# 1 "_gitreset path/to/repo"
+  
+  if [ ! -d "$1" ]; then
+    _exit "$1 does not exist.";
+  else
+    cd $1;
+    $GIT reset --hard origin/master
+  fi
+}
+
+## $1:path/to/repo
+function _gitget {
+  _usage $# 1 "_gitget path/to/repo [file/name]";
+
+  if [ ! -d "$1" ]; then
+    _exit "$1 does not exist.";
+  else
+    if [ "$2" != "gitpull0" ]; then
+      __GITFN=$2
+    else
+      __GITFN="."
+    fi
+    
+    cd $1
+    
+    printf ${LPURPLE}
+    $GIT fetch && $GIT checkout origin/master -- $__GITFN;
+    printf ${RESTORE}
+    
+  fi
+}
+
+function _gitlist {
+  _usage $# 1 "_gitlist path/to/repo";
+  
+  cd $1;
+  $GIT fetch --quiet origin;
+  local LIST="$($GIT diff origin/master --name-only)";
+  if [ "$LIST" ];then
+    printf "$LIST";
+  fi
+}
+
+
+## FILE MANAGEMENT
+##################
+
+function _mydir {
+  cd "$MYDIR";
+}
+
+## Create if not exists
+function _mkdir {
+  _usage $# 1 "_mkdir path/to/make"
+  if [ ! -d "$1" ]; then
+    mkdir -p $1;
+  fi  
+}
+# _mkdir /tmp/pac/xxx/yyy
+
+
+## Get File Stamp $1:file/path
+function _filedate {
+  _usage $# 1 "_filedate path/to/file"
+  if [ ! -f "$1" ];then
+    printf "-1";
+  else
+    printf $(stat -c %Y $1);
+  fi  
+}
+
+# _filedate _tar README.md
+
+## $1:SRC $2:GZF
+function _tar {
+  _usage $# 2 "tar file-name tar-name"
+  if [ -f "$1" ];then
+    $TAR -zcf $2 $1 >/dev/null 2>&1
+  else
+    _exit "$1 does not exist."
+  fi  
+}
+
+# _tar README.md README.tar.gz;
+
+## $1:GZF
+function _untar {
+  _usage $# 1 "untar tar-name.tar.gz"
+  if [ -f "$1" ];then
+    $TAR -xf $1 >/dev/null 2>&1
+  fi
+}
+
+#_untar README.tar.gz /tmp/pac
+
+function _logo {
+  printf ${CYAN};
+  printf '%s\n' '   ___  __  _____  ____       ____';
+  printf '%s\n' '  / _ \/ / / / _ \/ __/ _  __|_  /';
+  printf '%s\n' ' / ___/ /_/ / , _/ _/  | |/ //_ < ';
+  printf '%s\n' '/_/   \____/_/|_/___/  |___/____/ '
+  printf ${RESTORE};
+}
+
+##### DIRECT-CONSOLE ######
+if [ ! "${BASH_SOURCE[0]}" != "${0}" ]; then
+  if [ "$1" ];then
+    _$1 $2 $3 $4;
+  fi
+fi
+

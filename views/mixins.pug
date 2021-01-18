@@ -28,14 +28,13 @@ mixin repopt(path)
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') ×
           br
-          form
-            +fitem({text:'Format'},{type:'combo',id:'rep_format',required:true,data:[{value:'pdf',text:'PDF View'},{value:'html',text:'HTML View'},{value:'excel',text:'XLSX Download'}]})
-            br
-            div.text-center
-              +button('Go',{color:'green',icon:'print'})
-              +button('Cancel',{id:'repop_go',color:'blue'})
-          
+          form.bs-form
 
+          div.text-center
+            br
+            +button('Go',{id:'report_go',color:'green',icon:'print'})
+            +button('Cancel',{color:'blue', 'data-dismiss':'modal', 'aria-label':'Close'})
+          
 mixin fieldset(text)
   -text=text || '';
   fieldset&attributes(fset)
@@ -91,7 +90,9 @@ mixin button(text,arg)
     arg=arg||{};
     var color=arg.color||'primary'; delete arg.color;
   button(type="button" class=`btn btn-${colmap[color]}`)&attributes(arg)
-    =text
+    if arg.icon
+      i.fa(class=`fa-${arg.icon}`)
+    span=text
 
 mixin label(arg)
   -

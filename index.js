@@ -249,7 +249,8 @@ module.exports = Object.assign(module.exports,{
           	query     : arg.query,
           	userauth  : arg.session.user,
           	session   : arg.session,
-          	config    : mex.config
+          	config    : mex.config,
+          	app       : mex
         },function(err,html){
           if(err) return cb({error:true,msg:err.message})
           else cb(html);  
@@ -299,6 +300,18 @@ module.exports = Object.assign(module.exports,{
   },
 
   get :{
+
+    menus: function(){
+      var menus = mex.config.MENUS;
+      for(var men in menus){
+        menus[men].id = men;
+        menus[men].children = menus[men].children || {};
+        for(var child in menus[men].children){
+          menus[men].children[child].id = child;    
+        }
+      }
+      return menus;
+    },
 
     bhave:function(key){
       if(key) return mex.config.BHAVE[key];

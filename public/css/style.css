@@ -166,3 +166,11 @@ label {
   background-color: aliceblue;
 }
 
+.modal button i.fa {
+  margin-right: 0.25em;
+}
+
+.dropdown-item {
+  cursor:pointer
+}
+

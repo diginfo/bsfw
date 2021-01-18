@@ -18,6 +18,7 @@ var test = {
     };
     
     var req = {
+      // http://mydev.puremfg.net:8008/pho/pdf/vmfg/ms_inv_part?testc=1&testi=11
       path  : '/pho/html/vmfg/ms_inv_part',
       query : {
         base_id     : 'WLH-0000219',

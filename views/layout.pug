@@ -2,6 +2,11 @@ include ./mixins.pug
 -
   var title = "Visual-PAS"
   //if(session) console.log(session.role);
+  session = session || {};
+  var pdata = {
+    menus   : app.config.MENUS,
+    umenus  : session.menus
+  }
 
 //-
   doctype html
@@ -28,19 +33,27 @@ html(lang="en")
       meta(name="author",content="")
       link(rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon")
       title=title
-
+      
+      // global styles
       link(rel="stylesheet" href="css/fa/css/all.min.css")
       link(rel="stylesheet" href="bs/css/bootstrap.min.css")
       link(rel="stylesheet" href="css/style.css")      
+      
+      // page styles
       block style
+    
+    // page data
+    block data
+      script.
+        window.pagedata = !{JSON.stringify(pdata)};
 
   body(data-spy="scroll",data-target=".scrollspy")
     +navbar()
     .container
       block content
-      // SCRIPTS
+      // global scripts
       script(src="js/jq/jquery-3.5.1.min.js" )
-      //script(src="js/jq/jquery-ui.min.js")
+      //-script(src="js/jq/jquery-ui.min.js")
       script(src="js/jq/jq-widgets.min.js")
       script(src="js/popper.min.js")
       script(src="bs/js/bootstrap.bundle.min.js")
@@ -48,5 +61,7 @@ html(lang="en")
       //-script(src="js/plugins.js")
       script(src="js/widgets.js")
       script(src="js/main.js")
+      
+      // page scripts
       block script
       

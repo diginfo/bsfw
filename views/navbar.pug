@@ -1,5 +1,6 @@
 -
   session = session || {}
+  var _menus = app.get.menus();
   
 mixin nav(brand)
   nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
@@ -10,48 +11,47 @@ mixin nav(brand)
       ul.navbar-nav
         block
 
-mixin nav-item(text,href,icon)
+mixin nav-item(item)
   li.nav-item
-    a.nav-link(href=href)
-      if icon
-        i.fa(class=`fa-${icon}`)
-      span=text
+    a.nav-link(href=item.href data-id=item.id)
+      if item.icon
+        i.fa(class=`fa-${item.icon}`)
+      span=item.text
 
-mixin nav-drop(text,icon)
+mixin nav-drop(item)
   li.nav-item.dropdown
-    a#navbarDropdown.nav-link.dropdown-toggle(href='#' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')
-      if icon
-        i.fa(class=`fa-${icon}`)
-      span=text
+    a#navbarDropdown.nav-link.dropdown-toggle(data-id=item.id href='#' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')
+      if item.icon
+        i.fa(class=`fa-${item.icon}`)
+      span=item.text
     .dropdown-menu(aria-labelledby='navbarDropdown')
       block
 
 mixin nav-drop-item(child)
-  a.dropdown-item(href=child.href)=child.text
+  - 
+    child.report = child.report || {};
+    if(child.report.fname) child.report.fname = child.report.fname.replace(/\.prpt$/,'');
+  
+  a.dropdown-item(href=child.href data-id=child.id)=child.text
   if child.icon
     i.fa(class=`fa-${child.icon}`)
 
 if session && session.menus
   +nav(config.APP.title || 'BS-FW')
-    +nav-item('Home','/','home')
+    +nav-item({text:'Home',href:'/',icon:'home',id:'home'})
     each path in session.menus
-      - var item = app.config.MENUS[path];
+      - var item = _menus[path];
       if item
         if item.children
-          +nav-drop(item.text,item.icon)
+          +nav-drop(item)
             each child in item.children
               +nav-drop-item(child)
         else 
-          +nav-item(item.text,path,item.icon)
-    +nav-item('Logout','/logout','sign-out-alt')
+          +nav-item(item)
+    
+    +nav-item({text:'Logout',href:'/logout',icon:'sign-out-alt',id:'logout'})
 
-script.
-  function report(id){
-    $('#modal-report object').attr('data',id);
-    $('#modal-repopt').modal('show');
-    //$('#modal-report').modal('show');
-  }
-      
+   
 //-
   +nav-item('home','Home','/','home')
   +nav-item('db','Database','/db','database')

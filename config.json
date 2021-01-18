@@ -7,14 +7,25 @@
   },
   
   "MENUS": {
-    "users":{"text":"Users","id":"users","icon":"user","default":true},
     
     "reports":{
       "text":"Reports",
-      "id":"reports",
       "icon":"print",
       "children":{
-        "ms_in_part":{"text":"Visual Part List","id":"ms_inv_part","href":"javascript:report('pho/pdf/vmfg/ms_inv_part');"}
+        "ms_inv_part":{"text":"Visual Part List",
+          "report":{
+            "fname": "ms_inv_part.prpt",
+            "conid": "VMFG",
+            "inputs": [
+              {"type":"combo","name":"testc","text":"Test Combo",
+                "data":[{"value":"1","text":"one"}]
+              },
+              {"type":"number","name":"testi","text":"Test Input"} 
+            ] 
+            
+          }
+          
+        }
       }
     }
   },

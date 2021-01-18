@@ -181,7 +181,7 @@ $(document)
   
     $(`nav .nav-item a[href$="${location.pathname}"]`).addClass('active');
     
-    if(location.pathname != '/' && location.pathname != '/logout') setCookie('lastPage',location.pathname);
+    if(location.pathname != '/logout') setCookie('lastPage',location.pathname);
     //history.replaceState({}, null, "/");
     
     inactive();

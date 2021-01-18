@@ -132,9 +132,11 @@ function dynadd(tgt='body',data){
     const div = $('<div class="dyn-group form-group" />');
     tgt.append(div);
     
-    const label   = $('<label class="dyn-label form-control-label" />');
-    label.text(item.text).appendTo(div);
-    delete(item.text);
+    if(item.text){
+      const label   = $('<label class="dyn-label form-control-label" />');
+      label.text(item.text).appendTo(div);
+      delete(item.text);
+    }
     
     if(item.type=='combo') {
       var data; if(item.data) data = item.data;
@@ -212,3 +214,4 @@ $(document)
       .click(report)
     
   });
+  

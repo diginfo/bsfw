@@ -1,9 +1,0 @@
-#!/bin/bash
-
-MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$MYDIR/utils";
-
-cd "$MYDIR";
-cp -rp "$MYDIR/initfiles/." "$MYDIR";
-npm install;
-

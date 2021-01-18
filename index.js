@@ -377,7 +377,7 @@ module.exports = Object.assign(module.exports,{
           })
       
       	ci(msg);
-      	ci(mex.path);
+      	ci('PATHS:',JSON.stringify(mex.path,null,2));
       	mex.flag.serving = true;
       });
       

@@ -1,3 +1,13 @@
+const mimes = {
+  'html'   : 'text/html',
+  'pdf'     : 'application/pdf',
+  'xls'     : 'application/vnd.ms-excel',
+  'excel'   : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'rtf'     : 'application/rtf',
+  'csv'     : 'text/csv',
+  'text'    : 'text/plain'
+}
+
 function today(){
   var d = new Date();
   return `${d.getFullYear()}-${d.getMonth().toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
@@ -29,15 +39,19 @@ function report_go(){
   
   modal.modal('hide')
   
+  //var report = clone(pagedata.menus.reports.children[data._id].report);
+  //cl(report);
+  
   var args = [];for(var key in data){
     if(key[0] != '_') args.push(`${key}=${data[key]}`);
   }
   
   var body = $('#modal-report .modal-body');
   body.find('object').remove();
-  var dob = $('<object type="application/pdf" width="100%" height="500" style="height: 85vh;" />');
+  //var dob = $(`<object type="${mimes[data._format]}" width="100%" height="500" style="height: 85vh;" />`);
+  var dob = $(`<object type="application/pdf" width="100%" height="500" style="height: 85vh;" />`);
   var url = `pho/${data._format}/${data._conid}/${data._fname}?${args.join('&')}`;
-  cl(url);
+  //cl(url);
   dob.appendTo(body);
   dob.attr('data',url);
   $('#modal-report').modal('show');
@@ -56,6 +70,13 @@ function report(e){
   var report = clone(pagedata.menus.reports.children[id].report);
   report.inputs = report.inputs || [];
   report.inputs.push (
+
+    {
+      type  : 'hidden',
+      name  : '_id',
+      value : id, 
+    },
+
     {
       type  : 'hidden',
       name  : '_fname',

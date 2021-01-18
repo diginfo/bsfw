@@ -30,8 +30,14 @@ mixin nav-drop(item)
 mixin nav-drop-item(child)
   - 
     child.report = child.report || {};
-    if(child.report.fname) child.report.fname = child.report.fname.replace(/\.prpt$/,'');
-  
+    if(child.report.fname) {
+      child.report.fname = child.report.fname.replace(/\.prpt$/,'');
+      child.href = '#';
+    }
+    
+    // not a report
+    else child.href = child.href || child.id;
+
   a.dropdown-item(href=child.href data-id=child.id)
     if child.icon
       i.fa(class=`fa-${child.icon}`)

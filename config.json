@@ -17,10 +17,7 @@
             "fname": "ms_inv_part.prpt",
             "conid": "VMFG",
             "inputs": [
-              {"type":"combo","name":"testc","text":"Test Combo",
-                "data":[{"value":"1","text":"one"}]
-              },
-              {"type":"number","name":"testi","text":"Test Input"} 
+              {"type":"number","name":"MIN_OHQ","text":"Minimum On-Hand","value":"1","min":"0"} 
             ] 
             
           }

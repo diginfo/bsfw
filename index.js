@@ -154,6 +154,7 @@ function expinit(){
 
   // page request
   mex.express.get('/*', (req, res) => {
+  	if(mex.config.APP.disable_login) return res.json({error:true,msg:'Logins disabled.'});
   	var view = mex.mod.path.basename(req.path);
   	if(!view || view=='/') view = 'index';
     return module.exports.render(view,req,function(html){

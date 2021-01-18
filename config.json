@@ -3,7 +3,8 @@
     "license": "",
     "port": 8008,
     "timer_mins": 15,
-    "title": "DIS BSFW"
+    "title": "DIS BSFW",
+    "disable_login": false
   },
   
   "MENUS": {

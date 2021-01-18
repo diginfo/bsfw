@@ -28,15 +28,24 @@ function report_go(){
   if(!valid) return;
   
   modal.modal('hide')
-  //cl(data);
   
   var args = [];for(var key in data){
     if(key[0] != '_') args.push(`${key}=${data[key]}`);
   }
   
-  $('#modal-report object').attr('data',`pho/${data._format}/${data._conid}/${data._fname}?${args.join('&')}`);
+  var body = $('#modal-report .modal-body');
+  body.find('object').remove();
+  var dob = $('<object type="application/pdf" width="100%" height="500" style="height: 85vh;" />');
+  var url = `pho/${data._format}/${data._conid}/${data._fname}?${args.join('&')}`;
+  cl(url);
+  dob.appendTo(body);
+  dob.attr('data',url);
   $('#modal-report').modal('show');
 
+}
+
+function clone(obj){
+  return JSON.parse(JSON.stringify(obj));  
 }
 
 function report(e){
@@ -44,8 +53,9 @@ function report(e){
   const id = me.attr('data-id');
   if(!(id in pagedata.menus.reports.children)) return;
   
-  var report = pagedata.menus.reports.children[id].report;
-  report.inputs.push(
+  var report = clone(pagedata.menus.reports.children[id].report);
+  report.inputs = report.inputs || [];
+  report.inputs.push (
     {
       type  : 'hidden',
       name  : '_fname',
@@ -60,47 +70,45 @@ function report(e){
     
     {
       type:'combo','text':'Format',name:'_format',data:[
-        {value:'pdf',text:'PDF View'},
+        {value:'pdf',text:'PDF View',selected:true},
         {value:'excel',text:'Excel Download'},
         {value:'html',text:'HTML View'},
       ]
     }
   );
   
-  dynadd('#modal-repopt .modal-body form',report.inputs);
+  dynadd('#modal-repopt .modal-body form.bs-form',report.inputs);
   $('#modal-repopt').modal('show');
 }
 
 function dynadd(tgt='body',data){
-
+  
+  /*
   data = data || [
     {type:'combo',name:'testc',text:'Test Combo',data:[
       {value:'1',text:'one'}  
     ]},
     {type:'number',name:'testi',text:'Test Input'},
   ]
-  
-  const top = $(tgt); 
-  var wrap = top.find('div.dyn-wrap').first();
-  if(wrap.length==0) {
-    wrap = $('<div class="dyn-wrap"/>');
-    wrap.appendTo(top);
-  }
-  
-  wrap.empty();
+  */
+  tgt = $(tgt);
+  tgt.empty();
   
   data.map(function(item){
+  
+    var cls = item.class;
+    delete(item.class);
     
     if(item.type=='hidden') {
       var input = $('<input />');
       input.attr(item);
-      input.appendTo(wrap);
+      input.appendTo(tgt);
       return;
     }
     
     item.required = item.required || true;
     const div = $('<div class="dyn-group form-group" />');
-    wrap.append(div);
+    tgt.append(div);
     
     const label   = $('<label class="dyn-label form-control-label" />');
     label.text(item.text).appendTo(div);
@@ -117,12 +125,10 @@ function dynadd(tgt='body',data){
       input.attr(item); 
     }
     
-    input.appendTo(div);
+    input.addClass(cls).appendTo(div);
     
   })
 }
-
-
 
 var inactive = function () {
   window.timer = '';

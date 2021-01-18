@@ -18,7 +18,6 @@ mixin report(path)
         .modal-body
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') ×
-          object(type='application/pdf' data=path width='100%' height='500' style='height: 85vh;') Not Supported
 
 mixin repopt(path)
   #modal-repopt.modal.fade
@@ -29,7 +28,6 @@ mixin repopt(path)
             span(aria-hidden='true') ×
           br
           form.bs-form
-
           div.text-center
             br
             +button('Go',{id:'report_go',color:'green',icon:'print'})

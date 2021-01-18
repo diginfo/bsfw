@@ -32,7 +32,7 @@ mixin nav-drop-item(child)
     child.report = child.report || {};
     if(child.report.fname) child.report.fname = child.report.fname.replace(/\.prpt$/,'');
   
-  a.dropdown-item(href=child.href||child.id data-id=child.id)
+  a.dropdown-item(href=child.href data-id=child.id)
     if child.icon
       i.fa(class=`fa-${child.icon}`)
     span=child.text

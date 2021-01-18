@@ -534,6 +534,7 @@ $.widget("bs.combo",{
     const me = this.me();
     bs.dataOptions(me.self);
     me.el.addClass('form-control form-control-sm bs-combo');
+    me.el.prop('required',me.opt.required);
     me.el.attr({
       name  : me.opt.name,
       id    : me.opt.id

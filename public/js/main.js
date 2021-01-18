@@ -106,7 +106,8 @@ function dynadd(tgt='body',data){
       return;
     }
     
-    item.required = item.required || true;
+    var required = item.required || true;
+    delete(item.required);
     const div = $('<div class="dyn-group form-group" />');
     tgt.append(div);
     
@@ -117,15 +118,16 @@ function dynadd(tgt='body',data){
     if(item.type=='combo') {
       var data; if(item.data) data = item.data;
       delete item.data;
-      var input = $('<select class="dyn-combo form-control form-control-sm bs-combo" />');
+      var input = $('<select class="dyn-combo form-control form-control-sm bs-combo" data-validate="true" />');
       input.combo(item);
       if(data) input.combo('load',data);
     } else {
-      var input = $('<input class="dyn-input form-control form-control-sm bs-combo" />');
+      var input = $('<input class="dyn-input form-control form-control-sm bs-combo" data-validate="true" />');
       input.attr(item); 
     }
     
     input.addClass(cls).appendTo(div);
+    input.prop('required',required);
     
   })
 }

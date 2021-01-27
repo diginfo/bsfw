@@ -299,8 +299,11 @@ module.exports = Object.assign(module.exports,{
       if(mex.path.views.indexOf(view) < 0) mex.path.views.push(view);
     },
     
-    timed: function(fnid){
-      if(mex.timed.indexOf(fnid) < 0) mex.timed.push(fnid);
+    timed: function(fnids){
+      if(!Array.isArray(fnids)) fnids = [fnids];
+      find.map(function(fnid){
+        if(mex.timed.indexOf(fnid) < 0) mex.timed.push(fnid);  
+      });
     },    
     
     // append a sqlid to the lib/sqlid.js object
@@ -380,14 +383,17 @@ module.exports = Object.assign(module.exports,{
         mex.lib.user.restore();
         
         // call 5 minute timer
-        if(mex.config.APP.timer_mins > 0) timer(function(day,hms){
-          // mex.lib.user.sesscln();
-          mex.timed = [...new Set(mex.timed)];
-          for(var idx in mex.timed){
+        if(mex.config.APP.timer_mins > 0) timer(function(){
+           mex.timed = [...new Set(mex.timed)];
+           mex.mod.async.eachSeries(mex.timed,function(idx,next) {
             try{mex.timed[idx]()}
-            catch(err){ce(`${mex.timed[idx]}:${err}`)}
-          }
-          })
+            catch(err){ce(`Timer: ${mex.timed[idx]}:${err}`)}
+            finally{next()}
+          },function(){
+            cl(`Timer processd ${mex.timed.length} events.`)
+          });
+          
+        });
       
       	ci(msg);
       	ci('PATHS:',JSON.stringify(mex.path,null,2));

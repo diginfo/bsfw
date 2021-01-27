@@ -28,7 +28,8 @@ mex.flag = {
   ismod       : (require.main != module),
   stopping    : false,
   os          : process.platform,
-  isbin       : _isbin
+  isbin       : _isbin,
+  debug       : false,
 }
 
 mex.path = {
@@ -50,6 +51,9 @@ mex.path = {
 // load the config first.
 mex.config = require(mex.path.config);
 
+// Debugging.
+mex.flag.debug = mex.config.APP.debug || false;
+if(!mex.flag.debug) global.cl = function(){};
 
 mex.bhave = mex.config.BHAVE || {};
 mex.timed = [];
@@ -143,6 +147,7 @@ function expinit(){
   // Logout endpoint
   mex.express.get('/logout', function (req, res) {
     module.exports.render('index',req,function(html){
+      if(html.error) cl(html);
       req.session.destroy();
       res.send(html);
     });
@@ -158,6 +163,7 @@ function expinit(){
   	var view = mex.mod.path.basename(req.path);
   	if(!view || view=='/') view = 'index';
     return module.exports.render(view,req,function(html){
+      if(html.error) cl(html);
       res.send(html);  
     });
   });
@@ -240,10 +246,11 @@ module.exports = Object.assign(module.exports,{
     arg.session = arg.session || {user:null};
     arg.query = arg.query || {};
   
-    var ppath;
-    for(var i in mex.path.views.reverse()){
+    var ppath; for(var i in mex.path.views.reverse()){
       ppath = mex.mod.path.join(mex.path.views[i],view);
       if(!(/\.pug$/).test(ppath)) ppath += '.pug';
+      
+      // we found the file.
       if(mex.mod.fs.existsSync(ppath)) {
         mex.mod.pug.renderFile(ppath,{
             basedir   : mex.path.views[0],
@@ -254,11 +261,17 @@ module.exports = Object.assign(module.exports,{
           	app       : mex
         },function(err,html){
           if(err) return cb({error:true,msg:err.message})
-          else cb(html);  
+          else return cb(html);  
         });       
         break;
       }
+      
     }
+    
+    // file not found:
+    var msg = `Cannot find view:${view} in any paths.`;
+    return cb({error:true, msg:msg});
+    
   },
 
   define: {

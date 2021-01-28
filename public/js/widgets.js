@@ -541,9 +541,11 @@ $.widget("bs.combo",{
     })
 
     // load options added using html.
+    /*
     $(me.el).find('option').each(function(idx){
       if($(this).val()) me.opt.data.push({text:$(this).text(),value:$(this).val()})
     });
+    */
 
   },
   

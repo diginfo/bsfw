@@ -539,6 +539,12 @@ $.widget("bs.combo",{
       name  : me.opt.name,
       id    : me.opt.id
     })
+
+    // load options added using html.
+    $(me.el).find('option').each(function(idx){
+      if($(this).val()) me.opt.data.push({text:$(this).text(),value:$(this).val()})
+    });
+
   },
   
   _init: function(evt){

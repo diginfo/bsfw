@@ -103,7 +103,7 @@ mixin combo(arg)
   -
     var data = arg.data; delete arg.data;
   select.form-control.form-control-sm.bs-combo()&attributes(arg)
-    option(disabled selected) Select
+    option(disabled selected value="") Select
     if data
       each item in data
         option(value=item.value)=item.text

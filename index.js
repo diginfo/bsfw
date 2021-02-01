@@ -385,7 +385,9 @@ module.exports = Object.assign(module.exports,{
         // call 5 minute timer
         if(mex.config.APP.timer_mins > 0) timer(function(){
            mex.timed = [...new Set(mex.timed)];
-           mex.mod.async.eachSeries(mex.timed,function(idx,next) {
+           var idx = -1;
+           mex.mod.async.eachSeries(mex.timed,function(_func,next) {
+            idx++;
             try{mex.timed[idx]()}
             catch(err){ce(`Timer: ${mex.timed[idx]}:${err}`)}
             finally{next()}
@@ -439,6 +441,13 @@ process.on('uncaughtException', module.exports.onExit.bind(null, {exit:true}));
 libinit();
 expinit();
 
+/*
+function test(){
+  console.log('@ timer-push test');
+}
+mex.timed.push(test);
+cl(mex.timed);
+*/
 
 
 

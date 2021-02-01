@@ -301,7 +301,7 @@ module.exports = Object.assign(module.exports,{
     
     timed: function(fnids){
       if(!Array.isArray(fnids)) fnids = [fnids];
-      find.map(function(fnid){
+      fnids.map(function(fnid){
         if(mex.timed.indexOf(fnid) < 0) mex.timed.push(fnid);  
       });
     },    

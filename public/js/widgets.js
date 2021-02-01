@@ -540,6 +540,11 @@ $.widget("bs.combo",{
       id    : me.opt.id
     })
 
+    /*
+      options that are loaded using using mixin ???  
+      
+    */
+
     // load options added using html.
     /*
     $(me.el).find('option').each(function(idx){

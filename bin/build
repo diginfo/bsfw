@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-REPO="phil";
+## CURRENT APP/REPOID
+REPO="";
 
 STAMP=`date "+%y%m%d-%H%M%S"`
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

@@ -33,7 +33,7 @@ function _sync {
 
 function _win64 {
   rsync -ra $BINDIR/files/* $WIN64;
-  rsync -ra $NODEDIR/node_modules/bsfw/binlib/win64/* $WIN64;
+  rsync -ra $NODEDIR/node_modules/bsfw/bin/lib/win64/* $WIN64;
   echo "Compiling $WIN64 .."
 
   
@@ -47,7 +47,7 @@ function _win64 {
 
 function _linux {
   rsync -ra $BINDIR/files/* $LINUX;
-  rsync -ra $NODEDIR/node_modules/bsfw/binlib/linux/* $LINUX;
+  rsync -ra $NODEDIR/node_modules/bsfw/bin/lib/linux/* $LINUX;
   echo "Compiling $LINUX .."
   
   ## SERVER

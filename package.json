@@ -1,25 +1,4 @@
 {
-  "_from": "git+https://github.com/diginfo/bsfw.git",
-  "_id": "bsfw@0.0.1",
-  "_inBundle": false,
-  "_integrity": "",
-  "_location": "/bsfw",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "git",
-    "raw": "git+https://github.com/diginfo/bsfw.git",
-    "rawSpec": "git+https://github.com/diginfo/bsfw.git",
-    "saveSpec": "git+https://github.com/diginfo/bsfw.git",
-    "fetchSpec": "https://github.com/diginfo/bsfw.git",
-    "gitCommittish": null
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "git+https://github.com/diginfo/bsfw.git#79ca507875e9faa49ac58c013614a5ba6f497442",
-  "_spec": "git+https://github.com/diginfo/bsfw.git",
-  "_where": "/usr/share/dev/nodejs/src/visual/pas/v2/node",
   "author": {
     "name": "DiS"
   },
@@ -68,5 +47,5 @@
     "private": true
   },
   "scripts": {},
-  "version": "0.0.29"
+  "version": "0.0.30"
 }

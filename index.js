@@ -5,6 +5,7 @@ global.ci = console.info;
 
 const mex = module.exports;
 
+// External Modules
 mex.mod = {
   async       : require('async'),
   path        : require('path'),
@@ -12,6 +13,16 @@ mex.mod = {
   crypto      : require('crypto'),
   util        : require('util'),
   pug         : require('pug'),
+}
+
+// Internal Libs
+mex._libs = {
+  fn      : 'fn',
+  db      : 'db',
+  mailer  : 'mailer',
+  sqlid   : 'sqlid',
+  user    : 'user',
+  pho     : 'pentaho'
 }
 
 const express = require('express');
@@ -58,15 +69,17 @@ if(!mex.flag.debug) global.cl = function(){};
 mex.bhave = mex.config.BHAVE || {};
 mex.timed = [];
 
-// Custom Module Libs
-function libinit(){
+// Internal Lib Load / Reload
+function libinit(reload=false){
+  
   mex.lib = {};
-  mex.lib.fn     = require(mex.mod.path.join(mex.path.lib,'./fn.js'));
-  mex.lib.db     = require(mex.mod.path.join(mex.path.lib,'./db'));
-  mex.lib.mailer = require(mex.mod.path.join(mex.path.lib,'./mailer'));
-  mex.lib.sqlid  = require(mex.mod.path.join(mex.path.lib,'./sqlid'));
-  mex.lib.user   = require(mex.mod.path.join(mex.path.lib,'./user'));
-  mex.lib.pho    = require(mex.mod.path.join(mex.path.lib,'./pentaho'));  
+  for(var key in mex._libs){
+    var mod = mex._libs[key];
+    var path = mex.mod.path.join(mex.path.lib,`${mod}.js`);
+    if(reload) delete require.cache[require.resolve(path)];
+    mex.lib[key] = require(path);
+  }
+
 }
 
 // initialise express.
@@ -277,13 +290,13 @@ module.exports = Object.assign(module.exports,{
   define: {
 
     config: function(path){
-      //delete require.cache[require.resolve(mex.path.config)];
       if(path) mex.path.config = path;
       var config = require(mex.path.config);
       mex.config = mex.lib.fn.merge(mex.config,config);
       
-      // reload database defs
-      mex.lib.db.load();
+      // re-load all standard modules.
+      libinit(true);
+
     },
 
     db: function(){
@@ -448,6 +461,3 @@ function test(){
 mex.timed.push(test);
 cl(mex.timed);
 */
-
-
-

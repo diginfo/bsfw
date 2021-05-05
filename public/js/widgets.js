@@ -813,6 +813,7 @@ $.widget("bs.dgrid",{
     data = data || {};
     var row = this.getNewRow(data);
     var idx = this.appendRow(row);
+    if(idx < 0) return;
     var arg = this.options.onBeforeAdd(idx,row);
     row = Object.assign(row,arg);
     this.editRow(idx,row);
@@ -862,7 +863,9 @@ $.widget("bs.dgrid",{
   },
   
   appendRow: function(item){
+    if(!this.options.data.rows) return -1;
     var idx = this.options.data.rows.push(item)-1;
+    if(idx < 0) idx = 0;
     this.load(this.options.data);
     return idx;
   },
@@ -1124,5 +1127,4 @@ $.widget("bs.dgrid",{
     if(this.options.editable) this.addButtons();
   }       
   
-})      
-  
+})

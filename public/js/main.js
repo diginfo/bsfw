@@ -183,6 +183,16 @@ $(document)
   //var lastPage = ( $.cookie("lastPage") == null ) ? "index" : $.cookie("lastPage");
   //location.href = lastPage;
 
+  // call select() event on tab-panel if defined
+  .off('shown.bs.tab').on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+  	var bits = e.target.href.split('#');
+  	if(bits.length == 2){
+  		var id = bits[1];
+  		var tab = $(`#${id}`);
+  		if(typeof(tab.select)=='function') tab.select();
+  	}
+  })
+
   .on('keyup','input[type="date"]', function(e) {
     e.preventDefault();
     if(e.keyCode==84) $(this).val(today());

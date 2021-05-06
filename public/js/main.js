@@ -1,3 +1,29 @@
+const tabs = {
+  select: function(id){
+    var el = tabs.list(id);
+    el.removeClass('active');
+    el.tab('show');
+    return el;
+  },
+  
+  index: function(idx){
+    return $('.nav.nav-tabs:visible a[role=tab]')[idx]  
+  },
+  
+  first: function(){
+    return $('.nav.nav-tabs:visible a[role=tab]').first();
+  },
+  
+  list: function(id){
+    if(id) {
+      id = id.replace(/^.*#/,'');
+      return $(`.nav-tabs a[href="#${id}"]`);
+    }
+    else return $('.nav.nav-tabs:visible a[role=tab]');
+  }
+
+}
+
 const mimes = {
   'html'   : 'text/html',
   'pdf'     : 'application/pdf',
@@ -222,6 +248,9 @@ $(document)
     $('a[data-id]')
       //.data('xx',pagedata.menus.reports.children[$(this).attr('data-report')])
       .click(report)
+      
+    // Tabs
+    tabs.select(tabs.index(0).href);
     
   });
   

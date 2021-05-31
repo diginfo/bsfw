@@ -75,8 +75,7 @@
 
   "SQLITE": {
     "UI": {
-      "database"    : "/usr/share/dev/nodejs/src/pure3/data/dwap.db",
-      "_database"   : "data/ui.db",
+      "database"    : "$bsfw/data/dwap.db",
       "timeout_ms"  : 2000
     }
   },

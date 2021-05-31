@@ -45,29 +45,52 @@ block style
       
                      
 block content
+
+  +log(app.config)
+  +log(app.path)
+
   if !userauth
     .min-container.py-md-2
       .card-panel.p-sm-5.position-relative
         .text-center
-          img.img-fluid.w-50(src='img/dis.cologo.png' alt='Logo')
-          h1.h2.mt-5 PAS Admin Login
+          img.img-fluid.w-50(src='img/cologo.png' alt='Logo')
+          h1.h2.mt-5=`${title} Login`
         form#loginForm.mt-5(autocomplete='on')
           p.small.mb-2.text-scarlet
-          .form-group.position-relative
-            label.sr-only(for='email') Email
-            input.form-control.input-lg.rounded-0.upper(autocomplete='username' autofocus name='username' type='text' placeholder='Username' required)
-            i.fa.fa-user.fa-lg.position-absolute
+         
+          .input-group.mb-3
+            .input-group-prepend
+              span#basic-addon1.input-group-text
+                i.fas.fa-user
+            input#username.input.form-control(autocomplete='password' name='username' type='text' value='' placeholder='Username' aria-label='Username' aria-describedby='basic-addon1')
+          
           label.pull-left.sr-only(for='password') Password
           .position-relative
-            input#password.form-control.input-lg.rounded-0(autocomplete='password' name='password' type='password' placeholder='Password' required)
-            i.fa.fa-lock.fa-lg.position-absolute
+            .input-group
+              span#basic-addon1.input-group-text
+                i.fas.fa-lock
+              input#password.input.form-control(autocomplete='password' name='password' type='password' value='' placeholder='Password' required='true' aria-label='password' aria-describedby='basic-addon1')
+              .input-group-append
+                span.input-group-text(onclick='password_show_hide();')
+                  i#show_eye.fas.fa-eye
+                  i#hide_eye.fas.fa-eye-slash.d-none
+            br
+            
+            //-
+              .form-group.form-check.text-center
+                input#remember_me.form-check-input(type='checkbox' name='remember')
+                label.form-check-label(for='remember_me') Remember me
+          
           .text-center.my-4
             input.btn.btn-primary.text-white.btn-lg.text-uppercase(type='submit' value='Login')
+
   else
     .d-flex.justify-content-md-center.align-items-center.vh-100
       div.text-center
-        img.img-fluid.w-100(src='img/dis.cologo.png' alt='Logo')
-        p.font-weight-light.logo VISUAL PAS
+        img.img-fluid.w-100(src='img/cologo.png' alt='Logo')
+        div
+          br
+          p.font-weight-light.logo=title
         
 block script
   script.
@@ -82,5 +105,21 @@ block script
         if(res=='success') location.href = lp;  
       }) 
     })
-        
+
+
+    function password_show_hide() {
+      var x = document.getElementById("password");
+      var show_eye = document.getElementById("show_eye");
+      var hide_eye = document.getElementById("hide_eye");
+      hide_eye.classList.remove("d-none");
+      if (x.type === "password") {
+        x.type = "text";
+        show_eye.style.display = "none";
+        hide_eye.style.display = "block";
+      } else {
+        x.type = "password";
+        show_eye.style.display = "block";
+        hide_eye.style.display = "none";
+      }
+    }
         

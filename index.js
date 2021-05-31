@@ -46,17 +46,33 @@ mex.flag = {
 mex.path = {
     
   // ABSOLUTE Path to Root (outside snapshot)
-  abs     : __abs,                                // /usr/share/dev/nodejs/src/bsfws
+  abs     : __abs,                                        // /usr/share/dev/nodejs/src/bsfws
+  root    : __abs,
   
-  // In pkg these are all relative: to /snapshot 
+  /* 
+    In pkg these are all relative: to /snapshot
+  */ 
   config  : mex.mod.path.join(__dirname,'./config.json'), //  /snapshot/bsfw/config.json
+  
   lib     : mex.mod.path.join(__dirname,'./lib'),         //  /snapshot/bsfw/lib
+  
   data    : mex.mod.path.join(__dirname,'./data'),        //  /snapshot/bsfw/data
+  
   prpt    : [mex.mod.path.join(__abs,'./prpt')],          //  [/snapshot/bsfw/prpt]
 
-  views   : [mex.mod.path.join(__dirname,'./views')],
-  public  : [mex.mod.path.join(__dirname,'./public')],
-
+  views   : [   /* first come - first served */
+    mex.mod.path.join(__abs,'./views'),
+    mex.mod.path.join(__dirname,'./views'),
+  ],
+  
+  public  : [   /* first come - first served */
+    mex.mod.path.join(__abs,'./public'),
+    mex.mod.path.join(__dirname,'./public'),
+  ],
+  
+  // ABSOLUTE path to bsfw module
+  bsfw    : mex.mod.path.join(__abs,'./node_modules/bsfw')
+  
 };
 
 // load the config first.
@@ -90,15 +106,15 @@ function expinit(){
   mex.express = express();
   mex.sstore = new session.MemoryStore() 
   
-  // Views
+  // Define Views
   mex.express.set('views',mex.path.views);
   mex.express.set('view engine', 'pug');
   mex.express.set('env', 'development');
   
-  // App 3P Middleware
+  // Define public static folders (first come - first served)
   mex.path.public.map(function(pub){
     mex.express.use(express.static(pub));    
-  })
+  });
 
   // mex.express.use(require('cookie-parser')());
   mex.express.use(require('body-parser').json());
@@ -211,6 +227,13 @@ function timer(cb,delay){
 }
 
 module.exports = Object.assign(module.exports,{
+
+  resolve: function(path){
+    // test for app.path using $data/xxx/yyy/file.txt
+    var apath = path.match(/^\$([^\/]+)/);
+    if(apath && mex.path[apath[1]]) return path.replace(apath[0],mex.path[apath[1]])
+    return path
+  },
   
   onExit: function(options, err) {
     if(mex.flag.stopping) return;

@@ -11,6 +11,10 @@
   }
 
 
+mixin log(obj)
+  script.
+    console.log(!{JSON.stringify(obj)});
+
 mixin report()
   #modal-report.modal.fade
     .modal-dialog.modal-lg(role='document')

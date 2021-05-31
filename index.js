@@ -277,36 +277,45 @@ module.exports = Object.assign(module.exports,{
     } 
   },
 
-  // renders a page with pug
+  // renders a page with pug (first found - first served)
   render:function(view,arg,cb){
     arg.session = arg.session || {user:null};
     arg.query = arg.query || {};
-  
-    var ppath; for(var i in mex.path.views.reverse()){
-      ppath = mex.mod.path.join(mex.path.views[i],view);
+
+    var found,pdir, ppath; 
+    for(var i in mex.path.views){
+      pdir = mex.path.views[i]; 
+      ppath = mex.mod.path.join(pdir,view);
       if(!(/\.pug$/).test(ppath)) ppath += '.pug';
       
-      // we found the file.
+      // Found the file.
       if(mex.mod.fs.existsSync(ppath)) {
-        mex.mod.pug.renderFile(ppath,{
-            basedir   : mex.path.views[0],
-          	query     : arg.query,
-          	userauth  : arg.session.user,
-          	session   : arg.session,
-          	config    : mex.config,
-          	app       : mex
-        },function(err,html){
-          if(err) return cb({error:true,msg:err.message})
-          else return cb(html);  
-        });       
+        found = true;
         break;
       }
-      
     }
+
+    if(found){    
+      const opts = {
+        basedir   : pdir,
+      	query     : arg.query,
+      	userauth  : arg.session.user,
+      	session   : arg.session,
+      	config    : mex.config,
+      	app       : mex
+      } 
+  
+      mex.mod.pug.renderFile(ppath,opts,function(err,html){
+        if(err) return cb({error:true,msg:err.message})
+        else return cb(html);  
+      });
+    } 
     
     // file not found:
-    var msg = `Cannot find view:${view} in any paths.`;
-    return cb({error:true, msg:msg});
+    else {
+      var msg = `Cannot find view:${view} in any paths.`;
+      return cb({error:true, msg:msg});
+    }
     
   },
 

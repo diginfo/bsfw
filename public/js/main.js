@@ -250,7 +250,7 @@ $(document)
       .click(report)
       
     // Tabs
-    tabs.select(tabs.index(0).href);
+    try{tabs.select(tabs.index(0).href)} catch(e){}
     
   });
   

@@ -4,11 +4,12 @@ global.ce = console.error;
 global.ci = console.info;
 
 const mex = module.exports;
+const path = require('path'); 
 
 // External Modules
 mex.mod = {
   async       : require('async'),
-  path        : require('path'),
+  path        : path,
   fs          : require('fs'),
   crypto      : require('crypto'),
   util        : require('util'),
@@ -26,10 +27,10 @@ mex._libs = {
 }
 
 const express = require('express');
-__top = mex.mod.path.dirname(process.mainModule.filename);
+__top = path.dirname(process.mainModule.filename);
 
 const _isbin = (process.mainModule.filename.match(/snapshot/) != null)
-if(_isbin) __abs = mex.mod.path.dirname(process.argv[0]);
+if(_isbin) __abs = path.dirname(process.argv[0]);
 else __abs = __top;   
 
 mex.debug = false;
@@ -43,35 +44,68 @@ mex.flag = {
   debug       : false,
 }
 
+/*
+  PATHS: {
+    
+    "abs": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas",
+    "root": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas",
+    
+    "config": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\config.json",
+    
+    "lib": "C:\\snapshot\\node\\node_modules\\bsfw\\lib",
+    
+    "data": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\data",
+    
+    "prpt": [
+      "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\prpt"
+    ],
+    
+    "views": [
+      "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\templates",
+      "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\views",
+      
+      "C:\\snapshot\\node\\node_modules\\bsfw\\views"
+    ],
+    "public": [
+      "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\public",
+      
+      "C:\\snapshot\\node\\node_modules\\bsfw\\public"
+    ],
+    "bsfw": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\node_modules\\bsfw"
+  }
+*/
+
 mex.path = {
     
   // ABSOLUTE Path to Root (outside snapshot)
   abs     : __abs,                                        // /usr/share/dev/nodejs/src/bsfws
-  root    : __abs,
+  
+  dirname : __dirname,                                   // /snapshot/node/node_modules/bsfw
+  snapshot: __dirname,
   
   /* 
     In pkg these are all relative: to /snapshot
   */ 
-  config  : mex.mod.path.join(__dirname,'./config.json'), //  /snapshot/bsfw/config.json
+  config  : path.join(__dirname,'./config.json'), //  /snapshot/bsfw/config.json
   
-  lib     : mex.mod.path.join(__dirname,'./lib'),         //  /snapshot/bsfw/lib
+  lib     : path.join(__dirname,'./lib'),         //  /snapshot/bsfw/lib - C:\\snapshot\\node\\node_modules\\bsfw\\lib 
   
-  data    : mex.mod.path.join(__dirname,'./data'),        //  /snapshot/bsfw/data
+  data    : path.join(__dirname,'./data'),        //  /snapshot/bsfw/data
   
-  prpt    : [mex.mod.path.join(__abs,'./prpt')],          //  [/snapshot/bsfw/prpt]
+  prpt    : [path.join(__abs,'./prpt')],          //  [/snapshot/bsfw/prpt]
 
   views   : [   /* first come - first served */
-    mex.mod.path.join(__abs,'./views'),
-    mex.mod.path.join(__dirname,'./views'),
+    path.join(__abs,'./views'),
+    path.join(__dirname,'./views'),
   ],
   
   public  : [   /* first come - first served */
-    mex.mod.path.join(__abs,'./public'),
-    mex.mod.path.join(__dirname,'./public'),
+    path.join(__abs,'./public'),
+    path.join(__dirname,'./public'),
   ],
   
   // ABSOLUTE path to bsfw module
-  bsfw    : mex.mod.path.join(__abs,'./node_modules/bsfw')
+  bsfw    : path.join(__abs,'./node_modules/bsfw')
   
 };
 
@@ -91,9 +125,9 @@ function libinit(reload=false){
   mex.lib = {};
   for(var key in mex._libs){
     var mod = mex._libs[key];
-    var path = mex.mod.path.join(mex.path.lib,`${mod}.js`);
-    if(reload) delete require.cache[require.resolve(path)];
-    mex.lib[key] = require(path);
+    var _path = path.join(mex.path.lib,`${mod}.js`);
+    if(reload) delete require.cache[require.resolve(_path)];
+    mex.lib[key] = require(_path);
   }
 
 }
@@ -189,7 +223,7 @@ function expinit(){
   // page request
   mex.express.get('/*', (req, res) => {
   	if(mex.config.APP.disable_login) return res.json({error:true,msg:'Logins disabled.'});
-  	var view = mex.mod.path.basename(req.path);
+  	var view = path.basename(req.path);
   	if(!view || view=='/') view = 'index';
     return module.exports.render(view,req,function(html){
       if(html.error) cl(html);
@@ -228,11 +262,11 @@ function timer(cb,delay){
 
 module.exports = Object.assign(module.exports,{
 
-  resolve: function(path){
+  resolve: function(_path){
     // test for app.path using $data/xxx/yyy/file.txt
-    var apath = path.match(/^\$([^\/]+)/);
-    if(apath && mex.path[apath[1]]) return path.replace(apath[0],mex.path[apath[1]])
-    return path
+    var apath = _path.match(/^\$([^\/]+)/);
+    if(apath && mex.path[apath[1]]) return _path.replace(apath[0],mex.path[apath[1]])
+    return _path
   },
   
   onExit: function(options, err) {
@@ -285,7 +319,7 @@ module.exports = Object.assign(module.exports,{
     var found,pdir, ppath; 
     for(var i in mex.path.views){
       pdir = mex.path.views[i]; 
-      ppath = mex.mod.path.join(pdir,view);
+      ppath = path.join(pdir,view);
       if(!(/\.pug$/).test(ppath)) ppath += '.pug';
       
       // Found the file.
@@ -321,8 +355,8 @@ module.exports = Object.assign(module.exports,{
 
   define: {
 
-    config: function(path){
-      if(path) mex.path.config = path;
+    config: function(_path){
+      if(_path) mex.path.config = _path;
       var config = require(mex.path.config);
       mex.config = mex.lib.fn.merge(mex.config,config);
       
@@ -335,9 +369,9 @@ module.exports = Object.assign(module.exports,{
       mex.lib.db.load();  
     },
     
-    lib: function(name,path){
-      delete require.cache[require.resolve(path)];
-      mex.lib[name] = require(path);  
+    lib: function(name,_path){
+      delete require.cache[require.resolve(_path)];
+      mex.lib[name] = require(_path);  
     },
     
     view: function(view){

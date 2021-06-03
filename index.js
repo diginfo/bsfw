@@ -27,11 +27,12 @@ mex._libs = {
 }
 
 const express = require('express');
-__top = path.dirname(process.mainModule.filename);
+__app = path.dirname(process.mainModule.filename);
+__bsfw = __dirname;
 
 const _isbin = (process.mainModule.filename.match(/snapshot/) != null)
 if(_isbin) __abs = path.dirname(process.argv[0]);
-else __abs = __top;   
+else __abs = __app;   
 
 mex.debug = false;
 
@@ -44,68 +45,29 @@ mex.flag = {
   debug       : false,
 }
 
-/*
-  PATHS: {
-    
-    "abs": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas",
-    "root": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas",
-    
-    "config": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\config.json",
-    
-    "lib": "C:\\snapshot\\node\\node_modules\\bsfw\\lib",
-    
-    "data": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\data",
-    
-    "prpt": [
-      "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\prpt"
-    ],
-    
-    "views": [
-      "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\templates",
-      "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\views",
-      
-      "C:\\snapshot\\node\\node_modules\\bsfw\\views"
-    ],
-    "public": [
-      "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\public",
-      
-      "C:\\snapshot\\node\\node_modules\\bsfw\\public"
-    ],
-    "bsfw": "C:\\Users\\cls.DIS-VAIO-CLS\\vpas\\node_modules\\bsfw"
-  }
-*/
-
 mex.path = {
-    
-  // ABSOLUTE Path to Root (outside snapshot)
-  abs     : __abs,                                        // /usr/share/dev/nodejs/src/bsfws
-  
-  dirname : __dirname,                                   // /snapshot/node/node_modules/bsfw
-  snapshot: __dirname,
-  
-  /* 
-    In pkg these are all relative: to /snapshot
-  */ 
-  config  : path.join(__dirname,'./config.json'), //  /snapshot/bsfw/config.json
-  
-  lib     : path.join(__dirname,'./lib'),         //  /snapshot/bsfw/lib - C:\\snapshot\\node\\node_modules\\bsfw\\lib 
-  
-  data    : path.join(__dirname,'./data'),        //  /snapshot/bsfw/data
-  
-  prpt    : [path.join(__abs,'./prpt')],          //  [/snapshot/bsfw/prpt]
 
+    // ABSOLUTES - Path to Root (editable and outside /snapshot)
+  abs       : __abs,                                        // /usr/share/dev/nodejs/src/bsfws
+  prpt      : [path.join(__abs,'./prpt')],                  //  [/snapshot/bsfw/prpt]
+  
+  // REALATIVES - Relative to Internal Snapshot
+  app       : __app,                                        // the app root folder (/snapshot/node)
+  bsfw      : __bsfw,                                       // the bsfw module folder
+  
+  config  : path.join(__bsfw,'./config.json'),              //  /snapshot/bsfw/config.json
+  lib     : path.join(__bsfw,'./lib'),                      //  /snapshot/bsfw/lib - C:\\snapshot\\node\\node_modules\\bsfw\\lib 
+  data    : path.join(__bsfw,'./data'),                     //  /snapshot/bsfw/data
+  
   views   : [   /* first come - first served */
-    path.join(__abs,'./views'),
-    path.join(__dirname,'./views'),
+    path.join(__app,'./views'),
+    path.join(__bsfw,'./views'),
   ],
   
   public  : [   /* first come - first served */
-    path.join(__abs,'./public'),
-    path.join(__dirname,'./public'),
+    path.join(__app,'./public'),
+    path.join(__bsfw,'./public'),
   ],
-  
-  // ABSOLUTE path to bsfw module
-  bsfw    : path.join(__abs,'./node_modules/bsfw')
   
 };
 
@@ -233,6 +195,11 @@ function expinit(){
 
 }
 
+function error(err){
+  res.send(`<html><h1></h1></html>`)
+}
+
+
 function api(req,res,next){
 	cl('api:',req.path,req.query);
 	//cl(sstore.sessions)
@@ -312,45 +279,24 @@ module.exports = Object.assign(module.exports,{
   },
 
   // renders a page with pug (first found - first served)
-  render:function(view,arg,cb){
-    arg.session = arg.session || {user:null};
-    arg.query = arg.query || {};
+  render: function(view,req,cb){
 
-    var found,pdir, ppath; 
-    for(var i in mex.path.views){
-      pdir = mex.path.views[i]; 
-      ppath = path.join(pdir,view);
-      if(!(/\.pug$/).test(ppath)) ppath += '.pug';
-      
-      // Found the file.
-      if(mex.mod.fs.existsSync(ppath)) {
-        found = true;
-        break;
-      }
-    }
+    req.session = req.session || {user:null};
+    req.query = req.query || {};
 
-    if(found){    
-      const opts = {
-        basedir   : pdir,
-      	query     : arg.query,
-      	userauth  : arg.session.user,
-      	session   : arg.session,
-      	config    : mex.config,
-      	app       : mex
-      } 
-  
-      mex.mod.pug.renderFile(ppath,opts,function(err,html){
-        if(err) return cb({error:true,msg:err.message})
-        else return cb(html);  
-      });
-    } 
-    
-    // file not found:
-    else {
-      var msg = `Cannot find view:${view} in any paths.`;
-      return cb({error:true, msg:msg});
+    const opts = {
+    	query     : req.query,
+    	userauth  : req.session.user,
+    	session   : req.session,
+    	config    : mex.config,
+    	app       : mex
     }
     
+    mex.express.render(view,opts,function(err,html){
+      if(err) return cb({error:true,msg:`pug.renderFile(${err.message})`})
+      else return cb(html);
+    });
+
   },
 
   define: {

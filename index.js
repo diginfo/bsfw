@@ -55,18 +55,19 @@ mex.path = {
   app       : __app,                                        // the app root folder (/snapshot/node)
   bsfw      : __bsfw,                                       // the bsfw module folder
   
-  config  : path.join(__bsfw,'./config.json'),              //  /snapshot/bsfw/config.json
-  lib     : path.join(__bsfw,'./lib'),                      //  /snapshot/bsfw/lib - C:\\snapshot\\node\\node_modules\\bsfw\\lib 
-  data    : path.join(__bsfw,'./data'),                     //  /snapshot/bsfw/data
+  config  : path.join(__bsfw,'config.json'),                //  /snapshot/node_modules/bsfw/config.json
+  lib     : path.join(__bsfw,'lib'),                        //  /snapshot/node_modules/bsfw/lib - C:\\snapshot\\node\\node_modules\\bsfw\\lib 
+  data    : path.join(__bsfw,'data'),                       //  /snapshot/node_modules/bsfw/data
   
   views   : [   /* first come - first served */
-    path.join(__app,'./views'),
-    path.join(__bsfw,'./views'),
+    path.join(__app,'views'),                               // /snapshot/views
+    path.join(__bsfw,'views'),                              // /snapshot/node_modules/bsfw/views
   ],
   
   public  : [   /* first come - first served */
-    path.join(__app,'./public'),
-    path.join(__bsfw,'./public'),
+    path.join(__abs,'public'),                             // vpas/public (user editable)
+    path.join(__app,'public'),                             // /snapshot/public
+    path.join(__bsfw,'public'),                            // /snapshot/node_modules/bsfw/public
   ],
   
 };

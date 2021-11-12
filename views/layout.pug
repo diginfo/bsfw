@@ -1,7 +1,8 @@
 include ./mixins.pug
 -
-  var title = "Visual-PAS"
+  var title = app.config.APP.title;
   //if(session) console.log(session.role);
+  //console.log(app.config);
   session = session || {};
   var pdata = {
     menus   : app.config.MENUS,

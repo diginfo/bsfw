@@ -927,7 +927,9 @@ $.widget("bs.dgrid",{
           var help = $('<div class="help-block with-errors" />');
           var label = $(`<label>${col.title}</label>`);
           var val = row[col.field] || col.default || '';
-          col.required = col.required || true;
+          
+          // default to required
+          if(!('required' in col)) col.required = true;
           
           if(typeof col.editor == 'string'){
             var tag = 'input';
